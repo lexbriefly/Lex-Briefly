@@ -10,28 +10,51 @@ async function sendEmail({ to, subject, html, text }) {
         return { simulated: true };
     }
 
-    const res = await fetch(BREVO_API_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            'api-key': process.env.BREVO_API_KEY,
-        },
-        body: JSON.stringify({
-            sender: {
-                name: process.env.EMAIL_FROM_NAME || 'LEX Briefly',
-                email: process.env.EMAIL_FROM_ADDRESS,
+    if (!process.env.EMAIL_FROM_ADDRESS) {
+        // Brevo rejects requests with no sender address, but the resulting
+        // error is a generic 400 that doesn't make it obvious what to fix.
+        // Fail fast with a clear message instead.
+        throw new Error(
+            'EMAIL_FROM_ADDRESS is not set in .env. Set it to an email address you have verified as a sender in your Brevo account (Settings > Senders & IP).'
+        );
+    }
+
+    let res;
+    try {
+        res = await fetch(BREVO_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'api-key': process.env.BREVO_API_KEY,
             },
-            to: [{ email: to }],
-            subject,
-            htmlContent: html || `<p>${text}</p>`,
-            textContent: text,
-        }),
-    });
+            body: JSON.stringify({
+                sender: {
+                    name: process.env.EMAIL_FROM_NAME || 'LEX Briefly',
+                    email: process.env.EMAIL_FROM_ADDRESS,
+                },
+                to: [{ email: to }],
+                subject,
+                htmlContent: html || `<p>${text}</p>`,
+                textContent: text,
+            }),
+        });
+    } catch (networkErr) {
+        // fetch() itself throws on DNS/connection failures (no internet
+        // access, firewall blocking api.brevo.com, etc). Surface that
+        // distinctly from an API-level rejection so it's clear where to look.
+        throw new Error(`Could not reach Brevo API (network error): ${networkErr.message}`);
+    }
 
     if (!res.ok) {
         const errorBody = await res.text().catch(() => '');
-        throw new Error(`Brevo API error (${res.status}): ${errorBody}`);
+        let hint = '';
+        if (res.status === 401) {
+            hint = ' — check that BREVO_API_KEY is correct and active.';
+        } else if (res.status === 400 && /sender/i.test(errorBody)) {
+            hint = ' — check that EMAIL_FROM_ADDRESS is a verified sender in your Brevo account.';
+        }
+        throw new Error(`Brevo API error (${res.status}): ${errorBody}${hint}`);
     }
 
     return res.json();

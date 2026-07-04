@@ -56,7 +56,8 @@ exports.studentSignup = async (req, res) => {
                 await sendEmail({ to: existing.email, ...tpl });
             } catch (emailErr) {
                 console.error('[signup] Failed to send OTP email:', emailErr.message);
-                emailWarning = 'Your account is ready, but we could not send the verification email right now. Use "Resend it" below once email delivery is fixed.';
+                const detail = process.env.NODE_ENV === 'production' ? '' : ` (${emailErr.message})`;
+                emailWarning = `Your account is ready, but we could not send the verification email right now. Use "Resend it" below once email delivery is fixed.${detail}`;
             }
 
             res.cookie('pending_verification_email', existing.email, { httpOnly: true, maxAge: 15 * 60 * 1000 });
@@ -92,7 +93,8 @@ exports.studentSignup = async (req, res) => {
             // must NOT be reported as a failed signup, or the person is
             // stuck (retrying just hits "account already exists").
             console.error('[signup] Failed to send OTP email:', emailErr.message);
-            emailWarning = 'Your account was created, but we could not send the verification email right now. Use "Resend it" below once email delivery is fixed.';
+            const detail = process.env.NODE_ENV === 'production' ? '' : ` (${emailErr.message})`;
+            emailWarning = `Your account was created, but we could not send the verification email right now. Use "Resend it" below once email delivery is fixed.${detail}`;
         }
 
         res.cookie('pending_verification_email', user.email, { httpOnly: true, maxAge: 15 * 60 * 1000 });
@@ -162,9 +164,10 @@ exports.resendOtp = async (req, res) => {
             await sendEmail({ to: user.email, ...tpl });
         } catch (emailErr) {
             console.error('[resendOtp] Failed to send OTP email:', emailErr.message);
+            const detail = process.env.NODE_ENV === 'production' ? '' : ` (${emailErr.message})`;
             return res.render('auth/verify-otp', {
                 email,
-                error: 'We generated a new code, but could not send the email right now. Please check the email configuration and try again.',
+                error: `We generated a new code, but could not send the email right now. Please check the email configuration and try again.${detail}`,
                 info: null,
             });
         }
