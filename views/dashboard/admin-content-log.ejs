@@ -25,21 +25,26 @@
                 <div class="dash-card overflow-x-auto">
                     <table class="data-table">
                         <thead>
-                            <tr><th>Title</th><th>Type</th><th>Status</th><th>Uploaded By</th><th>Reviewed By</th><th>Updated</th></tr>
+                            <tr><th>Title</th><th>Type</th><th>Status</th><th>Uploaded By</th><th>Reviewed By</th><th>Updated</th><th></th></tr>
                         </thead>
                         <tbody>
                             <% items.forEach(function(item) { %>
-                                <tr>
+                                <tr id="content-row-<%= item._id %>">
                                     <td class="font-medium"><%= item.title %></td>
                                     <td class="text-light-gray"><%= item.type %></td>
                                     <td><span class="status-pill status-<%= item.status %>"><%= item.status %></span></td>
                                     <td class="text-light-gray/70"><%= item.uploadedBy ? item.uploadedBy.email : '—' %></td>
                                     <td class="text-light-gray/70"><%= item.reviewedBy ? item.reviewedBy.email : '—' %></td>
                                     <td class="text-light-gray/70"><%= new Date(item.updatedAt).toLocaleString() %></td>
+                                    <td>
+                                        <button data-action="delete-content" data-id="<%= item._id %>" class="text-red-400 hover:text-red-300" title="Delete">
+                                            <i class="ph-fill ph-trash text-lg"></i>
+                                        </button>
+                                    </td>
                                 </tr>
                             <% }); %>
                             <% if (items.length === 0) { %>
-                                <tr><td colspan="6" class="text-center text-light-gray/60 py-8">No content yet.</td></tr>
+                                <tr><td colspan="7" class="text-center text-light-gray/60 py-8">No content yet.</td></tr>
                             <% } %>
                         </tbody>
                     </table>
@@ -51,5 +56,23 @@
     </div>
 
     <%- include('../partials/scripts') %>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('[data-action="delete-content"]').forEach((btn) => {
+                btn.addEventListener('click', async () => {
+                    if (!confirm('Delete this content permanently? This cannot be undone.')) return;
+                    const id = btn.getAttribute('data-id');
+                    const res = await fetch(`/admin/content/${id}`, { method: 'DELETE' });
+                    const data = await res.json();
+                    if (data.success) {
+                        const row = document.getElementById(`content-row-${id}`);
+                        if (row) row.remove();
+                    } else {
+                        alert(data.message || 'Failed to delete.');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

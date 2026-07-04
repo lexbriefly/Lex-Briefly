@@ -3,6 +3,9 @@ const User = require('../models/User');
 const Content = require('../models/Content');
 const AuditLog = require('../models/AuditLog');
 const { sendEmail, cmsCredentialsTemplate } = require('../utils/email');
+const { fileToBlob } = require('../utils/fileToBlob');
+
+const CONTENT_TYPES = ['resource', 'book', 'bareact', 'case', 'internship', 'news'];
 
 async function log(action, req, extra = {}) {
     try {
@@ -39,6 +42,7 @@ exports.dashboard = async (req, res) => {
         studentCount,
         statusCounts,
         recentLogs,
+        contentTypes: CONTENT_TYPES,
         error: null,
         success: req.query.success || null,
     });
@@ -145,4 +149,51 @@ exports.contentLog = async (req, res) => {
 exports.auditLog = async (req, res) => {
     const logs = await AuditLog.find().sort({ createdAt: -1 }).limit(300);
     res.render('dashboard/admin-audit-log', { logs });
+};
+
+// ---- Admin can also add content directly, same fields as CMS uploads ----
+// Unlike CMS uploads (which go to 'pending' for admin review), content the
+// Admin creates publishes immediately — there's no one else to review it.
+exports.createContent = async (req, res) => {
+    try {
+        const { type, title, subtitle, description, category, tags, link, deadline, location, publishedDate, court, citation } = req.body;
+
+        if (!type || !CONTENT_TYPES.includes(type) || !title || !title.trim()) {
+            return res.redirect('/admin/dashboard?success=' + encodeURIComponent('Please provide a valid type and title.'));
+        }
+
+        const fileUrl = await fileToBlob(req.file);
+
+        const content = await Content.create({
+            type,
+            title,
+            subtitle,
+            description,
+            category,
+            tags: tags ? tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
+            link,
+            fileName: req.file && !fileUrl ? req.file.filename : undefined,
+            fileUrl: fileUrl || undefined,
+            meta: { deadline: deadline || undefined, location, publishedDate: publishedDate || undefined, court, citation },
+            uploadedBy: req.user._id,
+            status: 'published',
+            reviewedBy: req.user._id,
+            reviewedAt: new Date(),
+        });
+
+        await log('CONTENT_CREATED', req, { targetType: 'Content', targetId: content._id, details: `${type}: ${title} (admin, auto-published)` });
+
+        res.redirect('/admin/dashboard?success=' + encodeURIComponent(`"${title}" published.`));
+    } catch (err) {
+        console.error(err);
+        res.redirect('/admin/dashboard?success=' + encodeURIComponent('Failed to save content.'));
+    }
+};
+
+exports.deleteContent = async (req, res) => {
+    const content = await Content.findByIdAndDelete(req.params.id);
+    if (!content) return res.status(404).json({ success: false, message: 'Not found.' });
+
+    await log('CONTENT_DELETED', req, { targetType: 'Content', targetId: content._id, details: `${content.title} (deleted by admin)` });
+    res.json({ success: true });
 };

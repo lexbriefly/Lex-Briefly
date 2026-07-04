@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const Content = require('../models/Content');
 const User = require('../models/User');
 const AuditLog = require('../models/AuditLog');
+const { fileToBlob } = require('../utils/fileToBlob');
 
 async function log(action, req, extra = {}) {
     try {
@@ -81,6 +82,8 @@ exports.createContent = async (req, res) => {
             });
         }
 
+        const fileUrl = await fileToBlob(req.file);
+
         const content = await Content.create({
             type,
             title,
@@ -89,7 +92,8 @@ exports.createContent = async (req, res) => {
             category,
             tags: tags ? tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
             link,
-            fileName: req.file ? req.file.filename : undefined,
+            fileName: req.file && !fileUrl ? req.file.filename : undefined,
+            fileUrl: fileUrl || undefined,
             meta: { deadline: deadline || undefined, location, publishedDate: publishedDate || undefined, court, citation },
             uploadedBy: req.user._id,
             status: 'pending',

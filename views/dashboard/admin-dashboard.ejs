@@ -48,6 +48,85 @@
                     </div>
                 </div>
 
+                <div class="dash-card mb-10">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="font-heading font-bold text-lg flex items-center gap-2"><i class="ph ph-upload-simple text-gold"></i> Add Content Directly</h2>
+                        <span class="status-pill status-published">publishes immediately</span>
+                    </div>
+                    <p class="text-light-gray text-sm mb-5">Same fields CMS staff use, but since you're the reviewer, anything you add here goes live right away — no review step.</p>
+
+                    <form action="/admin/content" method="POST" enctype="multipart/form-data" class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="form-label" for="adminType">Content Type</label>
+                            <select class="form-input" id="adminType" name="type" required>
+                                <% contentTypes.forEach(function(t) { %>
+                                    <option value="<%= t %>"><%= t.charAt(0).toUpperCase() + t.slice(1) %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label" for="adminTitle">Title</label>
+                            <input class="form-input" type="text" id="adminTitle" name="title" required>
+                        </div>
+                        <div>
+                            <label class="form-label" for="adminSubtitle">Subtitle <span class="text-light-gray/50">(author / court / org)</span></label>
+                            <input class="form-input" type="text" id="adminSubtitle" name="subtitle">
+                        </div>
+                        <div>
+                            <label class="form-label" for="adminCategory">Category</label>
+                            <input class="form-input" type="text" id="adminCategory" name="category" placeholder="e.g. Semester 3, Constitutional Law">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="form-label" for="adminDescription">Description</label>
+                            <textarea class="form-input" id="adminDescription" name="description" rows="2"></textarea>
+                        </div>
+                        <div>
+                            <label class="form-label" for="adminTags">Tags <span class="text-light-gray/50">(comma separated)</span></label>
+                            <input class="form-input" type="text" id="adminTags" name="tags">
+                        </div>
+                        <div>
+                            <label class="form-label" for="adminLink">External Link <span class="text-light-gray/50">(optional)</span></label>
+                            <input class="form-input" type="url" id="adminLink" name="link" placeholder="https://...">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="form-label" for="adminFile">File <span class="text-light-gray/50">(PDF / DOC / image, optional)</span></label>
+                            <input class="form-input" type="file" id="adminFile" name="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                        </div>
+
+                        <details class="md:col-span-2 text-sm">
+                            <summary class="cursor-pointer text-light-gray hover:text-white-text">Type-specific fields (internships, news, cases)</summary>
+                            <div class="mt-3 grid md:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="form-label" for="adminDeadline">Internship Deadline</label>
+                                    <input class="form-input" type="date" id="adminDeadline" name="deadline">
+                                </div>
+                                <div>
+                                    <label class="form-label" for="adminLocation">Internship Location</label>
+                                    <input class="form-input" type="text" id="adminLocation" name="location">
+                                </div>
+                                <div>
+                                    <label class="form-label" for="adminPublishedDate">News Published Date</label>
+                                    <input class="form-input" type="date" id="adminPublishedDate" name="publishedDate">
+                                </div>
+                                <div>
+                                    <label class="form-label" for="adminCourt">Case Court</label>
+                                    <input class="form-input" type="text" id="adminCourt" name="court">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="form-label" for="adminCitation">Case Citation</label>
+                                    <input class="form-input" type="text" id="adminCitation" name="citation">
+                                </div>
+                            </div>
+                        </details>
+
+                        <div class="md:col-span-2">
+                            <button type="submit" class="btn-primary w-full md:w-auto px-8 py-3 rounded-xl font-semibold text-sm">
+                                Publish Now
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
                 <div class="grid lg:grid-cols-5 gap-8 mb-10">
                     <!-- Pending content review -->
                     <div class="lg:col-span-3">
