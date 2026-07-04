@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <% var pageTitle = 'Student Login | LEX Briefly'; %>
+    <%- include('../partials/head') %>
+</head>
+<body class="bg-rich-black text-white-text selection:bg-royal-blue selection:text-white-text">
+    <div class="auth-shell">
+        <svg class="watermark" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+            <path d="M224,112h-84.4l-7.3-65.7a8,8,0,0,0-15.9,1.7l7.1,64H40a8,8,0,0,0,0,16H98.9l-19.1,66.8A24,24,0,0,0,103,222.1l1.5-.4A24.1,24.1,0,0,0,120,200l17.7-61.9L155.4,200a24.1,24.1,0,0,0,15.5,21.7l1.5.4a24,24,0,0,0,23.2-27.3l-19.1-66.8H224a8,8,0,0,0,0-16ZM102,192.3l15-52.5,15,52.5a8.1,8.1,0,0,1-5.1,10,8.2,8.2,0,0,1-19.8-10Zm61,10a8.1,8.1,0,0,1-5.1-10l15-52.5,15,52.5a8.2,8.2,0,0,1-19.8,10ZM128,40a8,8,0,0,0,8-8V16a8,8,0,0,0-16,0V32A8,8,0,0,0,128,40Z"/>
+        </svg>
+
+        <div class="auth-card">
+            <div class="text-center mb-8">
+                <a href="/" class="inline-flex items-center gap-3 mb-4">
+                    <i class="ph-fill ph-scales text-4xl text-gold"></i>
+                    <span class="font-heading font-bold text-2xl text-white-text tracking-wide">LEX Briefly</span>
+                </a>
+                <h1 class="font-heading text-2xl font-bold">Student Login</h1>
+                <p class="text-light-gray text-sm mt-1">Welcome back. Continue your legal studies.</p>
+            </div>
+
+            <div class="glass-card rounded-2xl p-8">
+                <% if (typeof error !== 'undefined' && error) { %>
+                    <div class="alert-error mb-5 flex items-center gap-2">
+                        <i class="ph-fill ph-warning-circle"></i>
+                        <span><%= error %></span>
+                    </div>
+                <% } %>
+
+                <form action="/login" method="POST" class="space-y-4">
+                    <div>
+                        <label class="form-label" for="email">Email Address</label>
+                        <input class="form-input" type="email" id="email" name="email" required
+                               value="<%= typeof old !== 'undefined' && old.email ? old.email : '' %>" placeholder="you@example.com">
+                    </div>
+                    <div>
+                        <label class="form-label" for="password">Password</label>
+                        <input class="form-input" type="password" id="password" name="password" required placeholder="Your password">
+                    </div>
+
+                    <button type="submit" class="btn-primary w-full py-3 rounded-xl font-semibold text-sm mt-2">
+                        Log In
+                    </button>
+                </form>
+
+                <p class="text-center text-light-gray text-sm mt-6">
+                    New here?
+                    <a href="/signup" class="text-royal-yellow hover:underline font-medium">Create an account</a>
+                </p>
+            </div>
+
+            <p class="text-center text-light-gray/60 text-xs mt-6">
+                CMS staff or Admin?
+                <a href="/cms/login" class="hover:text-gold">CMS Login</a> &middot;
+                <a href="/admin/login" class="hover:text-gold">Admin Login</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

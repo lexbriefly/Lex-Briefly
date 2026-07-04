@@ -1,0 +1,43 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><%= typeof pageTitle !== 'undefined' ? pageTitle : 'LEX Briefly | Faculty of Law, University of Delhi' %></title>
+
+<!-- Fonts: Cinzel for Headings, Inter for Body -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Phosphor Icons -->
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        darkMode: 'class',
+        theme: {
+            extend: {
+                colors: {
+                    'deep-navy': '#071A35',
+                    'royal-blue': '#1E4DFF',
+                    'rich-black': '#0B0B0F',
+                    'gold': '#D4AF37',
+                    'royal-yellow': '#FFD54A',
+                    'light-gray': '#C7D2FE',
+                    'white-text': '#F8FAFC',
+                },
+                fontFamily: {
+                    heading: ['Cinzel', 'serif'],
+                    body: ['Inter', 'sans-serif'],
+                },
+                backgroundImage: {
+                    'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                    'hero-pattern': 'linear-gradient(to bottom, #071A35, #0B0B0F)',
+                }
+            }
+        }
+    }
+</script>
+
+<!-- Extracted custom stylesheet (was an inline <style> block per page) -->
+<link rel="stylesheet" href="/css/main.css">

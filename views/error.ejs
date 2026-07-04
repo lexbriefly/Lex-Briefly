@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <% var pageTitle = (typeof title !== 'undefined' ? title : 'Error') + ' | LEX Briefly'; %>
+    <%- include('partials/head') %>
+</head>
+<body class="bg-rich-black text-white-text selection:bg-royal-blue selection:text-white-text">
+    <div class="auth-shell">
+        <div class="auth-card text-center">
+            <a href="/" class="inline-flex items-center gap-3 mb-8">
+                <i class="ph-fill ph-scales text-4xl text-gold"></i>
+                <span class="font-heading font-bold text-2xl text-white-text tracking-wide">LEX Briefly</span>
+            </a>
+
+            <div class="glass-card rounded-2xl p-10">
+                <i class="ph-fill ph-warning-circle text-6xl text-royal-yellow mb-4"></i>
+                <h1 class="font-heading text-2xl font-bold mb-2"><%= typeof title !== 'undefined' ? title : 'Something Went Wrong' %></h1>
+                <p class="text-light-gray text-sm mb-8"><%= typeof message !== 'undefined' ? message : 'An unexpected error occurred.' %></p>
+                <a href="/" class="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-full font-medium text-sm">
+                    <i class="ph ph-house"></i>
+                    Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

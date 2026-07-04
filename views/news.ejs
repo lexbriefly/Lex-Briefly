@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <% var pageTitle = 'Legal News & Updates | LEX Briefly'; %>
+    <%- include('partials/head') %>
+</head>
+<body class="flex bg-rich-black text-white-text selection:bg-royal-blue selection:text-white-text">
+
+    <%- include('partials/sidebar') %>
+    <%- include('partials/mobile-drawer') %>
+
+    <div id="mainContent" class="flex-1 transition-all duration-300 md:ml-64 relative min-h-screen">
+        <%- include('partials/header') %>
+
+        <main class="pt-20">
+            <section class="relative min-h-[40vh] flex items-center py-16 overflow-hidden bg-hero-pattern border-b border-gold/10">
+                <canvas id="particle-canvas"></canvas>
+                <svg class="watermark" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M224,112h-84.4l-7.3-65.7a8,8,0,0,0-15.9,1.7l7.1,64H40a8,8,0,0,0,0,16H98.9l-19.1,66.8A24,24,0,0,0,103,222.1l1.5-.4A24.1,24.1,0,0,0,120,200l17.7-61.9L155.4,200a24.1,24.1,0,0,0,15.5,21.7l1.5.4a24,24,0,0,0,23.2-27.3l-19.1-66.8H224a8,8,0,0,0,0-16ZM102,192.3l15-52.5,15,52.5a8.1,8.1,0,0,1-5.1,10,8.2,8.2,0,0,1-19.8-10Zm61,10a8.1,8.1,0,0,1-5.1-10l15-52.5,15,52.5a8.2,8.2,0,0,1-19.8,10ZM128,40a8,8,0,0,0,8-8V16a8,8,0,0,0-16,0V32A8,8,0,0,0,128,40Z"/>
+                </svg>
+                <div class="container mx-auto px-6 md:px-12 relative z-10 text-center">
+                    <div class="reveal max-w-3xl mx-auto">
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gold/30 bg-deep-navy/50 text-gold text-xs font-semibold uppercase tracking-wider mb-6 backdrop-blur-sm">
+                            <i class="ph-fill ph-newspaper text-royal-yellow"></i> Announcements
+                        </div>
+                        <h1 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 drop-shadow-xl text-white-text">News & Updates</h1>
+                        <p class="text-light-gray/80 text-base md:text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
+                            Faculty announcements, events and legal news — published by the CMS team and reviewed by an administrator.
+                        </p>
+                        <div class="max-w-xl mx-auto">
+                            <div class="relative group">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none">
+                                    <i class="ph ph-magnifying-glass text-xl text-light-gray group-focus-within:text-royal-blue transition-colors"></i>
+                                </div>
+                                <input type="text" id="pageSearch" class="w-full bg-deep-navy/40 border border-gold/20 text-white-text text-base rounded-full focus:ring-2 focus:ring-royal-blue focus:border-royal-blue block pl-14 pr-6 p-4 transition-all placeholder-light-gray/40 backdrop-blur-sm shadow-2xl" placeholder="Search news...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="py-16 bg-rich-black">
+                <div class="container mx-auto px-6 md:px-12">
+                    <% if (items && items.length) { %>
+                        <div id="cardGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                            <% items.forEach(item => { %>
+                                <%- include('partials/content-card', { item }) %>
+                            <% }) %>
+                        </div>
+                    <% } else { %>
+                        <div class="glass-card rounded-2xl p-12 text-center max-w-xl mx-auto reveal">
+                            <i class="ph ph-tray text-4xl text-light-gray/40 mb-4"></i>
+                            <p class="text-light-gray">No news published yet.</p>
+                        </div>
+                    <% } %>
+                </div>
+            </section>
+        </main>
+
+        <%- include('partials/footer') %>
+    </div>
+
+    <%- include('partials/scripts') %>
+    <script src="/js/page-search.js"></script>
+</body>
+</html>

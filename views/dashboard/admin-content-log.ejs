@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <% var pageTitle = 'Content Log | LEX Briefly'; %>
+    <%- include('../partials/head') %>
+</head>
+<body class="flex bg-rich-black text-white-text selection:bg-royal-blue selection:text-white-text">
+
+    <%- include('../partials/sidebar') %>
+    <%- include('../partials/mobile-drawer') %>
+
+    <div id="mainContent" class="flex-1 transition-all duration-300 md:ml-64 relative min-h-screen">
+        <%- include('../partials/header') %>
+
+        <main class="pt-32 pb-20 px-6 md:px-12">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h1 class="font-heading text-3xl font-bold mb-1">Content Log</h1>
+                        <p class="text-light-gray text-sm">All content ever submitted, most recently updated first.</p>
+                    </div>
+                    <a href="/admin/dashboard" class="btn-secondary px-4 py-2 rounded-full text-sm flex items-center gap-2"><i class="ph ph-arrow-left"></i> Dashboard</a>
+                </div>
+
+                <div class="dash-card overflow-x-auto">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Title</th><th>Type</th><th>Status</th><th>Uploaded By</th><th>Reviewed By</th><th>Updated</th></tr>
+                        </thead>
+                        <tbody>
+                            <% items.forEach(function(item) { %>
+                                <tr>
+                                    <td class="font-medium"><%= item.title %></td>
+                                    <td class="text-light-gray"><%= item.type %></td>
+                                    <td><span class="status-pill status-<%= item.status %>"><%= item.status %></span></td>
+                                    <td class="text-light-gray/70"><%= item.uploadedBy ? item.uploadedBy.email : '—' %></td>
+                                    <td class="text-light-gray/70"><%= item.reviewedBy ? item.reviewedBy.email : '—' %></td>
+                                    <td class="text-light-gray/70"><%= new Date(item.updatedAt).toLocaleString() %></td>
+                                </tr>
+                            <% }); %>
+                            <% if (items.length === 0) { %>
+                                <tr><td colspan="6" class="text-center text-light-gray/60 py-8">No content yet.</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <%- include('../partials/footer') %>
+    </div>
+
+    <%- include('../partials/scripts') %>
+</body>
+</html>

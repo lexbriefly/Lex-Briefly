@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <% var pageTitle = 'Verify Your Email | LEX Briefly'; %>
+    <%- include('../partials/head') %>
+</head>
+<body class="bg-rich-black text-white-text selection:bg-royal-blue selection:text-white-text">
+    <div class="auth-shell">
+        <div class="auth-card">
+            <div class="text-center mb-8">
+                <a href="/" class="inline-flex items-center gap-3 mb-4">
+                    <i class="ph-fill ph-scales text-4xl text-gold"></i>
+                    <span class="font-heading font-bold text-2xl text-white-text tracking-wide">LEX Briefly</span>
+                </a>
+                <h1 class="font-heading text-2xl font-bold">Verify Your Email</h1>
+                <p class="text-light-gray text-sm mt-1">Enter the 6-digit code we sent to<br><span class="text-royal-yellow"><%= email %></span></p>
+            </div>
+
+            <div class="glass-card rounded-2xl p-8">
+                <% if (typeof error !== 'undefined' && error) { %>
+                    <div class="alert-error mb-5 flex items-center gap-2">
+                        <i class="ph-fill ph-warning-circle"></i>
+                        <span><%= error %></span>
+                    </div>
+                <% } %>
+                <% if (typeof info !== 'undefined' && info) { %>
+                    <div class="alert-success mb-5 flex items-center gap-2">
+                        <i class="ph-fill ph-check-circle"></i>
+                        <span><%= info %></span>
+                    </div>
+                <% } %>
+
+                <form action="/verify-otp" method="POST" class="space-y-4">
+                    <input type="hidden" name="email" value="<%= email %>">
+                    <div>
+                        <label class="form-label" for="otp">Verification Code</label>
+                        <input class="form-input otp-input" type="text" id="otp" name="otp" required
+                               maxlength="6" pattern="\d{6}" inputmode="numeric" placeholder="------" autofocus>
+                    </div>
+
+                    <button type="submit" class="btn-primary w-full py-3 rounded-xl font-semibold text-sm mt-2">
+                        Verify &amp; Continue
+                    </button>
+                </form>
+
+                <form action="/resend-otp" method="POST" class="mt-4">
+                    <input type="hidden" name="email" value="<%= email %>">
+                    <button type="submit" class="w-full text-center text-light-gray text-sm hover:text-royal-yellow transition-colors">
+                        Didn't get a code? <span class="underline">Resend it</span>
+                    </button>
+                </form>
+            </div>
+
+            <p class="text-center text-light-gray/60 text-xs mt-6">
+                Wrong email? <a href="/signup" class="hover:text-gold">Start over</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

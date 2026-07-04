@@ -1,0 +1,30 @@
+<% var activePage = typeof active !== 'undefined' ? active : null; %>
+<div id="mobileDrawer" class="fixed inset-0 bg-rich-black/95 backdrop-blur-md z-[100] transform -translate-x-full transition-transform duration-300 md:hidden flex flex-col">
+    <div class="flex justify-between items-center p-6 border-b border-gold/10">
+        <div class="flex items-center gap-3">
+            <i class="ph-fill ph-scales text-3xl text-gold"></i>
+            <span class="font-heading font-bold text-xl text-white-text mt-1">LEX Briefly</span>
+        </div>
+        <button id="closeDrawerBtn" class="text-light-gray hover:text-white-text">
+            <i class="ph ph-x text-3xl"></i>
+        </button>
+    </div>
+    <nav class="flex flex-col gap-4 p-6 overflow-y-auto">
+        <a href="/" class="text-lg font-medium <%= activePage === 'home' ? 'text-royal-blue' : 'text-light-gray hover:text-white-text' %> flex items-center gap-4"><i class="ph ph-house text-2xl"></i> Home</a>
+        <a href="/resource.html" class="text-lg font-medium <%= activePage === 'resources' ? 'text-royal-blue' : 'text-light-gray hover:text-white-text' %> flex items-center gap-4"><i class="ph ph-books text-gold text-2xl"></i> Resources</a>
+        <a href="/books.html" class="text-lg font-medium <%= activePage === 'books' ? 'text-royal-blue' : 'text-light-gray hover:text-white-text' %> flex items-center gap-4"><i class="ph ph-book-open-text text-gold text-2xl"></i> Books & Bare Acts</a>
+        <a href="/cases.html" class="text-lg font-medium <%= activePage === 'cases' ? 'text-royal-blue' : 'text-light-gray hover:text-white-text' %> flex items-center gap-4"><i class="ph ph-gavel text-gold text-2xl"></i> Case Laws</a>
+        <a href="/internship.html" class="text-lg font-medium <%= activePage === 'internships' ? 'text-royal-blue' : 'text-light-gray hover:text-white-text' %> flex items-center gap-4"><i class="ph ph-briefcase text-gold text-2xl"></i> Internships</a>
+        <a href="/news.html" class="text-lg font-medium <%= activePage === 'news' ? 'text-royal-blue' : 'text-light-gray hover:text-white-text' %> flex items-center gap-4"><i class="ph ph-newspaper text-gold text-2xl"></i> News & Updates</a>
+
+        <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+            <% const dashHref = currentUser.role === 'admin' ? '/admin/dashboard' : currentUser.role === 'cms' ? '/cms/dashboard' : '/dashboard'; %>
+            <a href="<%= dashHref %>" class="text-lg font-medium text-light-gray hover:text-white-text flex items-center gap-4 mt-6 pt-6 border-t border-gold/10"><i class="ph ph-squares-four text-royal-yellow text-2xl"></i> Dashboard</a>
+            <form action="/logout" method="POST">
+                <button type="submit" class="text-lg font-medium text-light-gray hover:text-white-text flex items-center gap-4"><i class="ph ph-sign-out text-royal-yellow text-2xl"></i> Logout</button>
+            </form>
+        <% } else { %>
+            <a href="/login" class="text-lg font-medium text-light-gray hover:text-white-text flex items-center gap-4 mt-6 pt-6 border-t border-gold/10"><i class="ph ph-sign-in text-royal-yellow text-2xl"></i> Login Panel</a>
+        <% } %>
+    </nav>
+</div>

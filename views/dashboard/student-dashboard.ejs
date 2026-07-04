@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <% var pageTitle = 'My Dashboard | LEX Briefly'; %>
+    <%- include('../partials/head') %>
+</head>
+<body class="flex bg-rich-black text-white-text selection:bg-royal-blue selection:text-white-text">
+
+    <%- include('../partials/sidebar') %>
+    <%- include('../partials/mobile-drawer') %>
+
+    <div id="mainContent" class="flex-1 transition-all duration-300 md:ml-64 relative min-h-screen">
+        <%- include('../partials/header') %>
+
+        <main class="pt-32 pb-20 px-6 md:px-12">
+            <div class="max-w-5xl mx-auto">
+                <div class="mb-10 reveal active">
+                    <h1 class="font-heading text-3xl md:text-4xl font-bold mb-2">Welcome back, <%= currentUser.name.split(' ')[0] %> 👋</h1>
+                    <p class="text-light-gray">Faculty of Law &middot; <%= currentUser.course || 'LL.B.' %><% if (currentUser.semester) { %> &middot; Semester <%= currentUser.semester %><% } %></p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6 mb-10">
+                    <a href="/resource.html" class="dash-card hover:border-royal-blue/50 transition-all group">
+                        <i class="ph ph-books text-3xl text-gold mb-3 group-hover:scale-110 transition-transform inline-block"></i>
+                        <h3 class="font-heading font-bold text-lg mb-1">Study Resources</h3>
+                        <p class="text-light-gray text-sm">Notes, guides & reference material.</p>
+                    </a>
+                    <a href="/books.html" class="dash-card hover:border-royal-blue/50 transition-all group">
+                        <i class="ph ph-book-open-text text-3xl text-gold mb-3 group-hover:scale-110 transition-transform inline-block"></i>
+                        <h3 class="font-heading font-bold text-lg mb-1">Books &amp; Bare Acts</h3>
+                        <p class="text-light-gray text-sm">Browse the digital library.</p>
+                    </a>
+                    <a href="/cases.html" class="dash-card hover:border-royal-blue/50 transition-all group">
+                        <i class="ph ph-gavel text-3xl text-gold mb-3 group-hover:scale-110 transition-transform inline-block"></i>
+                        <h3 class="font-heading font-bold text-lg mb-1">Case Laws</h3>
+                        <p class="text-light-gray text-sm">Landmark judgments & commentary.</p>
+                    </a>
+                    <a href="/internship.html" class="dash-card hover:border-royal-blue/50 transition-all group">
+                        <i class="ph ph-briefcase text-3xl text-gold mb-3 group-hover:scale-110 transition-transform inline-block"></i>
+                        <h3 class="font-heading font-bold text-lg mb-1">Internships</h3>
+                        <p class="text-light-gray text-sm">Open opportunities for students.</p>
+                    </a>
+                    <a href="/news.html" class="dash-card hover:border-royal-blue/50 transition-all group">
+                        <i class="ph ph-newspaper text-3xl text-gold mb-3 group-hover:scale-110 transition-transform inline-block"></i>
+                        <h3 class="font-heading font-bold text-lg mb-1">News &amp; Updates</h3>
+                        <p class="text-light-gray text-sm">Latest from the faculty.</p>
+                    </a>
+                    <div class="dash-card">
+                        <i class="ph ph-user-circle text-3xl text-royal-blue mb-3 inline-block"></i>
+                        <h3 class="font-heading font-bold text-lg mb-1">Account</h3>
+                        <p class="text-light-gray text-sm break-all"><%= currentUser.email %></p>
+                        <% if (currentUser.studentId) { %><p class="text-light-gray/70 text-xs mt-1">ID: <%= currentUser.studentId %></p><% } %>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <%- include('../partials/footer') %>
+    </div>
+
+    <%- include('../partials/scripts') %>
+</body>
+</html>

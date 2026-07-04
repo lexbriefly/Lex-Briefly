@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <% var pageTitle = 'Admin Login | LEX Briefly'; %>
+    <%- include('../partials/head') %>
+</head>
+<body class="bg-rich-black text-white-text selection:bg-royal-blue selection:text-white-text">
+    <div class="auth-shell">
+        <div class="auth-card">
+            <div class="text-center mb-8">
+                <a href="/" class="inline-flex items-center gap-3 mb-4">
+                    <i class="ph-fill ph-scales text-4xl text-gold"></i>
+                    <span class="font-heading font-bold text-2xl text-white-text tracking-wide">LEX Briefly</span>
+                </a>
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-gold/30 bg-deep-navy/50 text-gold text-xs font-semibold uppercase tracking-wider mb-3">
+                    <i class="ph-fill ph-shield-check"></i> Administrator
+                </div>
+                <h1 class="font-heading text-2xl font-bold">Admin Login</h1>
+                <p class="text-light-gray text-sm mt-1">Restricted access. Authorized personnel only.</p>
+            </div>
+
+            <div class="glass-card rounded-2xl p-8">
+                <% if (typeof error !== 'undefined' && error) { %>
+                    <div class="alert-error mb-5 flex items-center gap-2">
+                        <i class="ph-fill ph-warning-circle"></i>
+                        <span><%= error %></span>
+                    </div>
+                <% } %>
+
+                <form action="/admin/login" method="POST" class="space-y-4">
+                    <div>
+                        <label class="form-label" for="email">Email Address</label>
+                        <input class="form-input" type="email" id="email" name="email" required
+                               value="<%= typeof old !== 'undefined' && old.email ? old.email : '' %>" placeholder="admin@lexbriefly.com">
+                    </div>
+                    <div>
+                        <label class="form-label" for="password">Password</label>
+                        <input class="form-input" type="password" id="password" name="password" required placeholder="Your password">
+                    </div>
+
+                    <button type="submit" class="btn-primary w-full py-3 rounded-xl font-semibold text-sm mt-2">
+                        Log In to Admin Panel
+                    </button>
+                </form>
+            </div>
+
+            <p class="text-center text-light-gray/60 text-xs mt-6">
+                Student? <a href="/login" class="hover:text-gold">Student Login</a> &middot;
+                <a href="/cms/login" class="hover:text-gold">CMS Login</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

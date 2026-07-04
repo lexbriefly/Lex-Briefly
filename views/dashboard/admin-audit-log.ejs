@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <% var pageTitle = 'Audit Log | LEX Briefly'; %>
+    <%- include('../partials/head') %>
+</head>
+<body class="flex bg-rich-black text-white-text selection:bg-royal-blue selection:text-white-text">
+
+    <%- include('../partials/sidebar') %>
+    <%- include('../partials/mobile-drawer') %>
+
+    <div id="mainContent" class="flex-1 transition-all duration-300 md:ml-64 relative min-h-screen">
+        <%- include('../partials/header') %>
+
+        <main class="pt-32 pb-20 px-6 md:px-12">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h1 class="font-heading text-3xl font-bold mb-1">Audit Log</h1>
+                        <p class="text-light-gray text-sm">Full trail of logins, content moderation and account changes.</p>
+                    </div>
+                    <a href="/admin/dashboard" class="btn-secondary px-4 py-2 rounded-full text-sm flex items-center gap-2"><i class="ph ph-arrow-left"></i> Dashboard</a>
+                </div>
+
+                <div class="dash-card overflow-x-auto">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Action</th><th>Performed By</th><th>Details</th><th>IP</th><th>When</th></tr>
+                        </thead>
+                        <tbody>
+                            <% logs.forEach(function(log) { %>
+                                <tr>
+                                    <td class="font-medium"><%= log.action.replace(/_/g, ' ') %></td>
+                                    <td class="text-light-gray/70"><%= log.performedByLabel || '—' %> <span class="text-light-gray/40">(<%= log.performedByRole || '—' %>)</span></td>
+                                    <td class="text-light-gray/70"><%= log.details || '—' %></td>
+                                    <td class="text-light-gray/50 font-mono text-xs"><%= log.ip || '—' %></td>
+                                    <td class="text-light-gray/70"><%= new Date(log.createdAt).toLocaleString() %></td>
+                                </tr>
+                            <% }); %>
+                            <% if (logs.length === 0) { %>
+                                <tr><td colspan="5" class="text-center text-light-gray/60 py-8">No activity logged yet.</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <%- include('../partials/footer') %>
+    </div>
+
+    <%- include('../partials/scripts') %>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<%
+/* Expects: item (Content doc, lean), cardType (string) */
+const icons = {
+    resource: 'ph-file-text', book: 'ph-book-open-text', bareact: 'ph-gavel',
+    case: 'ph-gavel', internship: 'ph-briefcase', news: 'ph-newspaper',
+};
+const icon = icons[item.type] || 'ph-file-text';
+%>
+<div class="glass-card rounded-2xl p-6 flex flex-col group reveal" data-name="<%= item.title %>">
+    <div class="flex items-start justify-between mb-4">
+        <div class="w-12 h-12 rounded-xl bg-royal-blue/15 border border-royal-blue/20 flex items-center justify-center shrink-0">
+            <i class="ph ph-fill <%= icon %> text-2xl text-gold"></i>
+        </div>
+        <% if (item.category) { %>
+            <span class="text-xs font-semibold px-2 py-1 bg-deep-navy/60 text-light-gray rounded capitalize"><%= item.category %></span>
+        <% } %>
+    </div>
+
+    <h3 class="font-heading font-bold text-lg text-white-text mb-1 group-hover:text-gold transition-colors line-clamp-2"><%= item.title %></h3>
+
+    <% if (item.subtitle) { %>
+        <p class="text-xs text-light-gray/70 mb-3 flex items-center gap-1.5">
+            <i class="ph ph-user"></i> <%= item.subtitle %>
+        </p>
+    <% } %>
+
+    <% if (item.type === 'case' && item.meta) { %>
+        <p class="text-xs text-light-gray/60 mb-2"><% if (item.meta.court) { %><i class="ph ph-bank"></i> <%= item.meta.court %><% } %></p>
+        <p class="text-xs text-light-gray/60 mb-2"><% if (item.meta.citation) { %><i class="ph ph-hash"></i> <%= item.meta.citation %><% } %></p>
+    <% } %>
+
+    <% if (item.type === 'internship' && item.meta) { %>
+        <p class="text-xs text-light-gray/60 mb-1 flex items-center gap-1.5"><% if (item.meta.location) { %><i class="ph ph-map-pin"></i> <%= item.meta.location %><% } %></p>
+        <p class="text-xs text-light-gray/60 mb-2 flex items-center gap-1.5"><% if (item.meta.deadline) { %><i class="ph ph-calendar"></i> Deadline: <%= new Date(item.meta.deadline).toLocaleDateString() %><% } %></p>
+    <% } %>
+
+    <% if (item.description) { %>
+        <p class="text-sm text-light-gray mb-4 flex-1 line-clamp-3"><%= item.description %></p>
+    <% } %>
+
+    <div class="mt-auto flex items-center justify-between gap-2 pt-2">
+        <span class="text-[11px] text-light-gray/50"><%= new Date(item.createdAt).toLocaleDateString() %></span>
+        <% if (item.link) { %>
+            <a href="<%= item.link %>" target="_blank" rel="noopener" class="btn-secondary px-4 py-2 rounded-lg text-sm inline-flex items-center gap-2">
+                <i class="ph ph-arrow-square-out"></i> Open
+            </a>
+        <% } else if (item.fileName) { %>
+            <a href="/uploads/<%= item.fileName %>" target="_blank" rel="noopener" class="btn-secondary px-4 py-2 rounded-lg text-sm inline-flex items-center gap-2">
+                <i class="ph ph-download-simple"></i> Download
+            </a>
+        <% } %>
+    </div>
+</div>
