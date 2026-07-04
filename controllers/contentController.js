@@ -1,4 +1,5 @@
 const Content = require('../models/Content');
+const catalog = require('../utils/subjectsCatalog');
 
 async function published(type) {
     return Content.find({ type, status: 'published' }).sort({ createdAt: -1 }).lean();
@@ -13,8 +14,64 @@ exports.home = async (req, res) => {
 };
 
 exports.resources = async (req, res) => {
-    const items = await published('resource');
-    res.render('resource', { active: 'resources', items });
+    // Count published items per (semester, subjectCode, category) so each
+    // tile on the card can show how much content is actually there yet.
+    const counts = await Content.aggregate([
+        { $match: { type: 'resource', status: 'published', semester: { $exists: true, $ne: null } } },
+        {
+            $group: {
+                _id: { semester: '$semester', subjectCode: '$subjectCode', category: '$resourceCategory' },
+                count: { $sum: 1 },
+            },
+        },
+    ]);
+
+    const countMap = {};
+    counts.forEach((c) => {
+        const key = `${c._id.semester}|${c._id.subjectCode}|${c._id.category}`;
+        countMap[key] = c.count;
+    });
+
+    res.render('resource', {
+        active: 'resources',
+        semesters: catalog.SEMESTERS,
+        subjectsBySemester: catalog.SUBJECTS,
+        categories: catalog.CATEGORIES,
+        countMap,
+    });
+};
+
+exports.resourceDetail = async (req, res) => {
+    const { semester, subjectCode, category } = req.params;
+
+    const semesterInfo = catalog.findSemester(semester);
+    const subjectInfo = catalog.findSubject(semester, subjectCode);
+    const categoryInfo = catalog.findCategory(category);
+
+    if (!semesterInfo || !subjectInfo || !categoryInfo) {
+        return res.status(404).render('error', {
+            title: 'Not Found',
+            message: 'That resource tile does not exist.',
+        });
+    }
+
+    const items = await Content.find({
+        type: 'resource',
+        status: 'published',
+        semester,
+        subjectCode,
+        resourceCategory: category,
+    })
+        .sort({ createdAt: -1 })
+        .lean();
+
+    res.render('resource-detail', {
+        active: 'resources',
+        semesterInfo,
+        subjectInfo,
+        categoryInfo,
+        items,
+    });
 };
 
 exports.books = async (req, res) => {

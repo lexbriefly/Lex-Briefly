@@ -1,11 +1,5 @@
 const mongoose = require('mongoose');
 
-/**
- * A single generic schema powers every content page (Resources, Books & Bare
- * Acts, Case Laws, Internships, News). The `type` field determines which
- * page the item appears on, so CMS staff use one unified upload form and
- * the admin gets one unified moderation queue.
- */
 const contentSchema = new mongoose.Schema(
     {
         type: {
@@ -21,6 +15,25 @@ const contentSchema = new mongoose.Schema(
 
         category: { type: String, trim: true }, // e.g. Semester 3, Constitutional Law, Corporate
         tags: [{ type: String, trim: true }],
+
+        // Only used when type === 'resource'. Ties an upload to one of the
+        // four tiles (Case Materials / Notes & PDFs / PYQs / Video Classes)
+        // on a specific subject card of the Resources page.
+        semester: { type: String, trim: true, index: true }, // e.g. 'sem-3'
+        subjectCode: { type: String, trim: true, index: true }, // e.g. 'LB-301'
+        subjectName: { type: String, trim: true }, // denormalised for display
+        resourceCategory: {
+            type: String,
+            enum: ['case-materials', 'notes', 'pyq', 'video'],
+            index: true,
+        },
+        // Which upload template the CMS staffer picked. Drives how the tile
+        // renders the item (embed-style video button vs. document download).
+        template: {
+            type: String,
+            enum: ['pdf', 'video', 'link'],
+            default: 'link',
+        },
 
         // External link or uploaded file path (served from /uploads)
         link: { type: String, trim: true },

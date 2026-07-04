@@ -84,6 +84,43 @@
                             <label class="form-label" for="adminTags">Tags <span class="text-light-gray/50">(comma separated)</span></label>
                             <input class="form-input" type="text" id="adminTags" name="tags">
                         </div>
+
+                        <!-- Resource-tile fields: only relevant when Content Type = Resource -->
+                        <div id="adminResourceTileFields" class="hidden md:col-span-2 grid md:grid-cols-2 gap-4 border border-royal-blue/20 bg-royal-blue/5 rounded-xl p-4">
+                            <div>
+                                <label class="form-label" for="adminSemester">Semester</label>
+                                <select class="form-input" id="adminSemester" name="semester">
+                                    <option value="">Select semester…</option>
+                                    <% semesters.forEach(function(sem) { %>
+                                        <option value="<%= sem.key %>"><%= sem.label %></option>
+                                    <% }); %>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label" for="adminSubjectCode">Subject</label>
+                                <select class="form-input" id="adminSubjectCode" name="subjectCode">
+                                    <option value="">Select semester first…</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label" for="adminResourceCategory">Resource Tile</label>
+                                <select class="form-input" id="adminResourceCategory" name="resourceCategory">
+                                    <option value="">Select tile…</option>
+                                    <% categories.forEach(function(cat) { %>
+                                        <option value="<%= cat.key %>"><%= cat.icon %> <%= cat.label %></option>
+                                    <% }); %>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label" for="adminTemplate">Upload Template</label>
+                                <select class="form-input" id="adminTemplate" name="template">
+                                    <% templates.forEach(function(t) { %>
+                                        <option value="<%= t.key %>"><%= t.label %></option>
+                                    <% }); %>
+                                </select>
+                            </div>
+                        </div>
+
                         <div>
                             <label class="form-label" for="adminLink">External Link <span class="text-light-gray/50">(optional)</span></label>
                             <input class="form-input" type="url" id="adminLink" name="link" placeholder="https://...">
@@ -237,6 +274,29 @@
                     }
                 });
             });
+
+            // --- Resource-tile fields on the "Add Content Directly" form ---
+            const SUBJECTS_BY_SEMESTER = <%- JSON.stringify(subjectsBySemester) %>;
+            const adminTypeSelect = document.getElementById('adminType');
+            const adminTileFields = document.getElementById('adminResourceTileFields');
+            const adminSemesterSelect = document.getElementById('adminSemester');
+            const adminSubjectSelect = document.getElementById('adminSubjectCode');
+
+            function toggleAdminResourceFields() {
+                if (adminTypeSelect && adminTileFields) {
+                    adminTileFields.classList.toggle('hidden', adminTypeSelect.value !== 'resource');
+                }
+            }
+            function populateAdminSubjects() {
+                const subjects = SUBJECTS_BY_SEMESTER[adminSemesterSelect.value] || [];
+                adminSubjectSelect.innerHTML = '<option value="">Select subject…</option>' +
+                    subjects.map((s) => `<option value="${s.code}">${s.code} — ${s.name}</option>`).join('');
+            }
+            if (adminTypeSelect) {
+                adminTypeSelect.addEventListener('change', toggleAdminResourceFields);
+                toggleAdminResourceFields();
+            }
+            if (adminSemesterSelect) adminSemesterSelect.addEventListener('change', populateAdminSubjects);
         });
     </script>
 </body>

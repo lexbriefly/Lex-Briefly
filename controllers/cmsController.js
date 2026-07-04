@@ -4,6 +4,7 @@ const Content = require('../models/Content');
 const User = require('../models/User');
 const AuditLog = require('../models/AuditLog');
 const { fileToBlob } = require('../utils/fileToBlob');
+const catalog = require('../utils/subjectsCatalog');
 
 async function log(action, req, extra = {}) {
     try {
@@ -37,6 +38,10 @@ exports.dashboard = async (req, res) => {
         items,
         statusCounts,
         contentTypes: CONTENT_TYPES,
+        semesters: catalog.SEMESTERS,
+        subjectsBySemester: catalog.SUBJECTS,
+        categories: catalog.CATEGORIES,
+        templates: catalog.TEMPLATES,
         error: null,
         success: req.query.success || null,
     });
@@ -69,17 +74,53 @@ exports.changePassword = async (req, res) => {
     res.redirect('/cms/dashboard');
 };
 
+async function rerenderDashboardWithError(req, res, statusCode, errMsg) {
+    const items = await Content.find({ uploadedBy: req.user._id }).sort({ createdAt: -1 }).limit(100);
+    return res.status(statusCode).render('dashboard/cms-dashboard', {
+        items,
+        statusCounts: {},
+        contentTypes: CONTENT_TYPES,
+        semesters: catalog.SEMESTERS,
+        subjectsBySemester: catalog.SUBJECTS,
+        categories: catalog.CATEGORIES,
+        templates: catalog.TEMPLATES,
+        error: errMsg,
+        success: null,
+    });
+}
+
 exports.createContent = async (req, res) => {
     const errMsg = validationResult(req).array()[0]?.msg;
 
     try {
-        const { type, title, subtitle, description, category, tags, link, deadline, location, publishedDate, court, citation } = req.body;
+        const {
+            type, title, subtitle, description, category, tags, link, deadline, location, publishedDate, court, citation,
+            semester, subjectCode, resourceCategory, template,
+        } = req.body;
 
         if (errMsg) {
-            const items = await Content.find({ uploadedBy: req.user._id }).sort({ createdAt: -1 }).limit(100);
-            return res.status(400).render('dashboard/cms-dashboard', {
-                items, statusCounts: {}, contentTypes: CONTENT_TYPES, error: errMsg, success: null,
-            });
+            return rerenderDashboardWithError(req, res, 400, errMsg);
+        }
+
+        // Resource uploads must target a real tile on the public catalog —
+        // this is what lets the tile on the Resources page find the item
+        // again (semester + subjectCode + resourceCategory).
+        let subjectName;
+        if (type === 'resource') {
+            const semesterInfo = catalog.findSemester(semester);
+            const subjectInfo = catalog.findSubject(semester, subjectCode);
+            const categoryInfo = catalog.findCategory(resourceCategory);
+            if (!semesterInfo || !subjectInfo || !categoryInfo) {
+                return rerenderDashboardWithError(req, res, 400, 'Select a valid semester, subject and resource tile.');
+            }
+            subjectName = subjectInfo.name;
+
+            if (template === 'pdf' && !req.file && !link) {
+                return rerenderDashboardWithError(req, res, 400, 'For the PDF template, upload a file or paste a PDF link.');
+            }
+            if (template === 'video' && !link) {
+                return rerenderDashboardWithError(req, res, 400, 'For the Video template, paste a video link.');
+            }
         }
 
         const fileUrl = await fileToBlob(req.file);
@@ -95,6 +136,11 @@ exports.createContent = async (req, res) => {
             fileName: req.file && !fileUrl ? req.file.filename : undefined,
             fileUrl: fileUrl || undefined,
             meta: { deadline: deadline || undefined, location, publishedDate: publishedDate || undefined, court, citation },
+            semester: type === 'resource' ? semester : undefined,
+            subjectCode: type === 'resource' ? subjectCode : undefined,
+            subjectName: type === 'resource' ? subjectName : undefined,
+            resourceCategory: type === 'resource' ? resourceCategory : undefined,
+            template: type === 'resource' ? (template || 'link') : undefined,
             uploadedBy: req.user._id,
             status: 'pending',
         });
@@ -104,10 +150,7 @@ exports.createContent = async (req, res) => {
         res.redirect('/cms/dashboard?success=Content submitted for admin review.');
     } catch (err) {
         console.error(err);
-        const items = await Content.find({ uploadedBy: req.user._id }).sort({ createdAt: -1 }).limit(100);
-        res.status(500).render('dashboard/cms-dashboard', {
-            items, statusCounts: {}, contentTypes: CONTENT_TYPES, error: 'Failed to save content.', success: null,
-        });
+        rerenderDashboardWithError(req, res, 500, 'Failed to save content.');
     }
 };
 

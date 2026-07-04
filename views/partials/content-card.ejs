@@ -4,7 +4,12 @@ const icons = {
     resource: 'ph-file-text', book: 'ph-book-open-text', bareact: 'ph-gavel',
     case: 'ph-gavel', internship: 'ph-briefcase', news: 'ph-newspaper',
 };
-const icon = icons[item.type] || 'ph-file-text';
+let icon = icons[item.type] || 'ph-file-text';
+if (item.template === 'video') icon = 'ph-play-circle';
+else if (item.template === 'pdf') icon = 'ph-file-pdf';
+
+const ctaLabel = item.template === 'video' ? 'Watch Video' : (item.template === 'pdf' ? 'Open PDF' : 'Open');
+const ctaIcon = item.template === 'video' ? 'ph-play' : (item.template === 'pdf' ? 'ph-file-arrow-down' : 'ph-arrow-square-out');
 %>
 <div class="glass-card rounded-2xl p-6 flex flex-col group reveal" data-name="<%= item.title %>">
     <div class="flex items-start justify-between mb-4">
@@ -42,7 +47,11 @@ const icon = icons[item.type] || 'ph-file-text';
         <span class="text-[11px] text-light-gray/50"><%= new Date(item.createdAt).toLocaleDateString() %></span>
         <% if (item.link) { %>
             <a href="<%= item.link %>" target="_blank" rel="noopener" class="btn-secondary px-4 py-2 rounded-lg text-sm inline-flex items-center gap-2">
-                <i class="ph ph-arrow-square-out"></i> Open
+                <i class="ph <%= ctaIcon %>"></i> <%= ctaLabel %>
+            </a>
+        <% } else if (item.fileUrl) { %>
+            <a href="<%= item.fileUrl %>" target="_blank" rel="noopener" class="btn-secondary px-4 py-2 rounded-lg text-sm inline-flex items-center gap-2">
+                <i class="ph ph-download-simple"></i> Download
             </a>
         <% } else if (item.fileName) { %>
             <a href="/uploads/<%= item.fileName %>" target="_blank" rel="noopener" class="btn-secondary px-4 py-2 rounded-lg text-sm inline-flex items-center gap-2">

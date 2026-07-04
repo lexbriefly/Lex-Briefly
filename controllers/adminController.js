@@ -4,6 +4,7 @@ const Content = require('../models/Content');
 const AuditLog = require('../models/AuditLog');
 const { sendEmail, cmsCredentialsTemplate } = require('../utils/email');
 const { fileToBlob } = require('../utils/fileToBlob');
+const catalog = require('../utils/subjectsCatalog');
 
 const CONTENT_TYPES = ['resource', 'book', 'bareact', 'case', 'internship', 'news'];
 
@@ -43,6 +44,10 @@ exports.dashboard = async (req, res) => {
         statusCounts,
         recentLogs,
         contentTypes: CONTENT_TYPES,
+        semesters: catalog.SEMESTERS,
+        subjectsBySemester: catalog.SUBJECTS,
+        categories: catalog.CATEGORIES,
+        templates: catalog.TEMPLATES,
         error: null,
         success: req.query.success || null,
     });
@@ -156,10 +161,24 @@ exports.auditLog = async (req, res) => {
 // Admin creates publishes immediately — there's no one else to review it.
 exports.createContent = async (req, res) => {
     try {
-        const { type, title, subtitle, description, category, tags, link, deadline, location, publishedDate, court, citation } = req.body;
+        const {
+            type, title, subtitle, description, category, tags, link, deadline, location, publishedDate, court, citation,
+            semester, subjectCode, resourceCategory, template,
+        } = req.body;
 
         if (!type || !CONTENT_TYPES.includes(type) || !title || !title.trim()) {
             return res.redirect('/admin/dashboard?success=' + encodeURIComponent('Please provide a valid type and title.'));
+        }
+
+        let subjectName;
+        if (type === 'resource') {
+            const semesterInfo = catalog.findSemester(semester);
+            const subjectInfo = catalog.findSubject(semester, subjectCode);
+            const categoryInfo = catalog.findCategory(resourceCategory);
+            if (!semesterInfo || !subjectInfo || !categoryInfo) {
+                return res.redirect('/admin/dashboard?success=' + encodeURIComponent('Select a valid semester, subject and resource tile.'));
+            }
+            subjectName = subjectInfo.name;
         }
 
         const fileUrl = await fileToBlob(req.file);
@@ -175,6 +194,11 @@ exports.createContent = async (req, res) => {
             fileName: req.file && !fileUrl ? req.file.filename : undefined,
             fileUrl: fileUrl || undefined,
             meta: { deadline: deadline || undefined, location, publishedDate: publishedDate || undefined, court, citation },
+            semester: type === 'resource' ? semester : undefined,
+            subjectCode: type === 'resource' ? subjectCode : undefined,
+            subjectName: type === 'resource' ? subjectName : undefined,
+            resourceCategory: type === 'resource' ? resourceCategory : undefined,
+            template: type === 'resource' ? (template || 'link') : undefined,
             uploadedBy: req.user._id,
             status: 'published',
             reviewedBy: req.user._id,

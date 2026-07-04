@@ -80,11 +80,52 @@
                                     <label class="form-label" for="tags">Tags <span class="text-light-gray/50">(comma separated)</span></label>
                                     <input class="form-input" type="text" id="tags" name="tags">
                                 </div>
-                                <div>
-                                    <label class="form-label" for="link">External Link <span class="text-light-gray/50">(optional)</span></label>
+
+                                <!-- Resource-tile fields: only relevant when Content Type = Resource.
+                                     These tie the upload to one of the four tiles on a subject card
+                                     (Case Materials / Notes & PDFs / PYQs / Video Classes). -->
+                                <div id="resourceTileFields" class="hidden space-y-4 border border-royal-blue/20 bg-royal-blue/5 rounded-xl p-4">
+                                    <p class="text-xs text-light-gray/70 flex items-center gap-2"><i class="ph ph-info text-royal-blue"></i> Choose exactly which tile on the Resources page this upload appears on.</p>
+                                    <div>
+                                        <label class="form-label" for="semester">Semester</label>
+                                        <select class="form-input" id="semester" name="semester">
+                                            <option value="">Select semester…</option>
+                                            <% semesters.forEach(function(sem) { %>
+                                                <option value="<%= sem.key %>"><%= sem.label %></option>
+                                            <% }); %>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="form-label" for="subjectCode">Subject</label>
+                                        <select class="form-input" id="subjectCode" name="subjectCode">
+                                            <option value="">Select semester first…</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="form-label" for="resourceCategory">Resource Tile</label>
+                                        <select class="form-input" id="resourceCategory" name="resourceCategory">
+                                            <option value="">Select tile…</option>
+                                            <% categories.forEach(function(cat) { %>
+                                                <option value="<%= cat.key %>"><%= cat.icon %> <%= cat.label %></option>
+                                            <% }); %>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="form-label" for="template">Upload Template</label>
+                                        <select class="form-input" id="template" name="template">
+                                            <% templates.forEach(function(t) { %>
+                                                <option value="<%= t.key %>"><%= t.label %></option>
+                                            <% }); %>
+                                        </select>
+                                        <p id="templateHint" class="text-xs text-light-gray/60 mt-1.5"></p>
+                                    </div>
+                                </div>
+
+                                <div id="linkField">
+                                    <label class="form-label" for="link">External Link <span class="text-light-gray/50" id="linkFieldHint">(optional)</span></label>
                                     <input class="form-input" type="url" id="link" name="link" placeholder="https://...">
                                 </div>
-                                <div>
+                                <div id="fileField">
                                     <label class="form-label" for="file">File <span class="text-light-gray/50">(PDF / DOC / image, optional)</span></label>
                                     <input class="form-input" type="file" id="file" name="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
                                 </div>
@@ -128,19 +169,24 @@
                             <h2 class="font-heading font-bold text-lg mb-4 flex items-center gap-2"><i class="ph ph-stack text-gold"></i> My Submissions</h2>
                             <table class="data-table">
                                 <thead>
-                                    <tr><th>Title</th><th>Type</th><th>Status</th><th>Submitted</th></tr>
+                                    <tr><th>Title</th><th>Type</th><th>Tile</th><th>Status</th><th>Submitted</th></tr>
                                 </thead>
                                 <tbody>
                                     <% items.forEach(function(item) { %>
                                         <tr>
                                             <td class="font-medium"><%= item.title %></td>
                                             <td class="text-light-gray"><%= item.type %></td>
+                                            <td class="text-light-gray/70 text-xs">
+                                                <% if (item.type === 'resource' && item.subjectCode) { %>
+                                                    <%= item.subjectCode %> · <%= item.resourceCategory %>
+                                                <% } else { %>—<% } %>
+                                            </td>
                                             <td><span class="status-pill status-<%= item.status %>"><%= item.status %></span></td>
                                             <td class="text-light-gray/70"><%= new Date(item.createdAt).toLocaleDateString() %></td>
                                         </tr>
                                     <% }); %>
                                     <% if (items.length === 0) { %>
-                                        <tr><td colspan="4" class="text-center text-light-gray/60 py-8">No submissions yet.</td></tr>
+                                        <tr><td colspan="5" class="text-center text-light-gray/60 py-8">No submissions yet.</td></tr>
                                     <% } %>
                                 </tbody>
                             </table>
@@ -154,5 +200,72 @@
     </div>
 
     <%- include('../partials/scripts') %>
+    <script>
+        // Subjects per semester, mirrored from utils/subjectsCatalog.js on the server
+        const SUBJECTS_BY_SEMESTER = <%- JSON.stringify(subjectsBySemester) %>;
+        const TEMPLATE_HINTS = <%- JSON.stringify((templates || []).reduce((acc, t) => { acc[t.key] = t.hint; return acc; }, {})) %>;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const typeSelect = document.getElementById('type');
+            const tileFields = document.getElementById('resourceTileFields');
+            const semesterSelect = document.getElementById('semester');
+            const subjectSelect = document.getElementById('subjectCode');
+            const templateSelect = document.getElementById('template');
+            const templateHint = document.getElementById('templateHint');
+            const linkField = document.getElementById('linkField');
+            const linkInput = document.getElementById('link');
+            const linkFieldHint = document.getElementById('linkFieldHint');
+            const fileField = document.getElementById('fileField');
+            const fileInput = document.getElementById('file');
+
+            function toggleResourceFields() {
+                const isResource = typeSelect.value === 'resource';
+                tileFields.classList.toggle('hidden', !isResource);
+                if (isResource) {
+                    applyTemplate();
+                } else {
+                    linkField.classList.remove('hidden');
+                    fileField.classList.remove('hidden');
+                    linkFieldHint.textContent = '(optional)';
+                }
+            }
+
+            function populateSubjects() {
+                const subjects = SUBJECTS_BY_SEMESTER[semesterSelect.value] || [];
+                subjectSelect.innerHTML = '<option value="">Select subject…</option>' +
+                    subjects.map((s) => `<option value="${s.code}">${s.code} — ${s.name}</option>`).join('');
+            }
+
+            function applyTemplate() {
+                const tpl = templateSelect.value;
+                templateHint.textContent = TEMPLATE_HINTS[tpl] || '';
+
+                if (tpl === 'video') {
+                    linkField.classList.remove('hidden');
+                    fileField.classList.add('hidden');
+                    fileInput.value = '';
+                    linkInput.placeholder = 'https://youtube.com/watch?v=...';
+                    linkFieldHint.textContent = '(paste the video link)';
+                } else if (tpl === 'pdf') {
+                    linkField.classList.remove('hidden');
+                    fileField.classList.remove('hidden');
+                    linkInput.placeholder = 'https://... (direct PDF link, optional if uploading a file)';
+                    linkFieldHint.textContent = '(optional if you upload a file below)';
+                } else {
+                    linkField.classList.remove('hidden');
+                    fileField.classList.remove('hidden');
+                    linkInput.placeholder = 'https://...';
+                    linkFieldHint.textContent = '(paste the reference link)';
+                }
+            }
+
+            if (typeSelect) {
+                typeSelect.addEventListener('change', toggleResourceFields);
+                toggleResourceFields();
+            }
+            if (semesterSelect) semesterSelect.addEventListener('change', populateSubjects);
+            if (templateSelect) templateSelect.addEventListener('change', applyTemplate);
+        });
+    </script>
 </body>
 </html>
