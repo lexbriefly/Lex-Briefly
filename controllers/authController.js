@@ -38,9 +38,32 @@ exports.studentSignup = async (req, res) => {
         const existing = await User.findOne({ email: email.toLowerCase() });
 
         if (existing) {
-            return res.status(409).render('auth/student-signup', {
-                error: 'An account with this email already exists. Try logging in instead.',
-                old: req.body,
+            if (existing.isVerified) {
+                return res.status(409).render('auth/student-signup', {
+                    error: 'An account with this email already exists. Try logging in instead.',
+                    old: req.body,
+                });
+            }
+            // Account exists but was never verified (likely a previous signup
+            // whose verification email failed to send) — regenerate the OTP
+            // and let them continue instead of dead-ending on "already exists."
+            const otp = existing.generateOtp();
+            await existing.save();
+
+            const tpl = otpEmailTemplate(existing.name, otp);
+            let emailWarning = null;
+            try {
+                await sendEmail({ to: existing.email, ...tpl });
+            } catch (emailErr) {
+                console.error('[signup] Failed to send OTP email:', emailErr.message);
+                emailWarning = 'Your account is ready, but we could not send the verification email right now. Use "Resend it" below once email delivery is fixed.';
+            }
+
+            res.cookie('pending_verification_email', existing.email, { httpOnly: true, maxAge: 15 * 60 * 1000 });
+            return res.render('auth/verify-otp', {
+                email: existing.email,
+                error: emailWarning,
+                info: emailWarning ? null : 'We emailed you a 6-digit verification code.',
             });
         }
 
@@ -58,13 +81,26 @@ exports.studentSignup = async (req, res) => {
         const otp = user.generateOtp();
         await user.save();
 
-        const tpl = otpEmailTemplate(name, otp);
-        await sendEmail({ to: user.email, ...tpl });
-
         await log('USER_SIGNUP', req, { role: 'student', label: user.email, targetType: 'User', targetId: user._id });
 
+        const tpl = otpEmailTemplate(name, otp);
+        let emailWarning = null;
+        try {
+            await sendEmail({ to: user.email, ...tpl });
+        } catch (emailErr) {
+            // The account is already saved at this point — a failed email
+            // must NOT be reported as a failed signup, or the person is
+            // stuck (retrying just hits "account already exists").
+            console.error('[signup] Failed to send OTP email:', emailErr.message);
+            emailWarning = 'Your account was created, but we could not send the verification email right now. Use "Resend it" below once email delivery is fixed.';
+        }
+
         res.cookie('pending_verification_email', user.email, { httpOnly: true, maxAge: 15 * 60 * 1000 });
-        return res.render('auth/verify-otp', { email: user.email, error: null, info: 'We emailed you a 6-digit verification code.' });
+        return res.render('auth/verify-otp', {
+            email: user.email,
+            error: emailWarning,
+            info: emailWarning ? null : 'We emailed you a 6-digit verification code.',
+        });
     } catch (err) {
         console.error(err);
         return res.status(500).render('auth/student-signup', { error: 'Something went wrong. Please try again.', old: req.body });
@@ -122,7 +158,16 @@ exports.resendOtp = async (req, res) => {
         const otp = user.generateOtp();
         await user.save();
         const tpl = otpEmailTemplate(user.name, otp);
-        await sendEmail({ to: user.email, ...tpl });
+        try {
+            await sendEmail({ to: user.email, ...tpl });
+        } catch (emailErr) {
+            console.error('[resendOtp] Failed to send OTP email:', emailErr.message);
+            return res.render('auth/verify-otp', {
+                email,
+                error: 'We generated a new code, but could not send the email right now. Please check the email configuration and try again.',
+                info: null,
+            });
+        }
         return res.render('auth/verify-otp', { email, error: null, info: 'A new verification code has been sent.' });
     } catch (err) {
         console.error(err);
