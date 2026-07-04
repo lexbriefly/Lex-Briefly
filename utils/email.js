@@ -1,38 +1,40 @@
-const nodemailer = require('nodemailer');
+const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 
-let transporter = null;
-if (process.env.SMTP_HOST) {
-    transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: parseInt(process.env.SMTP_PORT || '587', 10),
-        secure: process.env.SMTP_PORT === '465',
-        auth: process.env.SMTP_USER
-            ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
-            : undefined,
-    });
-}
-
-/**
- * Sends an email if SMTP is configured; otherwise logs it to the console so
- * local development / demos still work without a mail server.
- */
 async function sendEmail({ to, subject, html, text }) {
-    if (!transporter) {
-        console.log('\n================ [DEV EMAIL — SMTP NOT CONFIGURED] ================');
+    if (!process.env.BREVO_API_KEY) {
+        console.log('\n================ [DEV EMAIL — BREVO_API_KEY NOT SET] ================');
         console.log(`To:      ${to}`);
         console.log(`Subject: ${subject}`);
         console.log(`Body:    ${text || html}`);
-        console.log('=====================================================================\n');
+        console.log('=======================================================================\n');
         return { simulated: true };
     }
 
-    return transporter.sendMail({
-        from: process.env.SMTP_FROM || '"LEX Briefly" <no-reply@lexbriefly.com>',
-        to,
-        subject,
-        html,
-        text,
+    const res = await fetch(BREVO_API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            'api-key': process.env.BREVO_API_KEY,
+        },
+        body: JSON.stringify({
+            sender: {
+                name: process.env.EMAIL_FROM_NAME || 'LEX Briefly',
+                email: process.env.EMAIL_FROM_ADDRESS,
+            },
+            to: [{ email: to }],
+            subject,
+            htmlContent: html || `<p>${text}</p>`,
+            textContent: text,
+        }),
     });
+
+    if (!res.ok) {
+        const errorBody = await res.text().catch(() => '');
+        throw new Error(`Brevo API error (${res.status}): ${errorBody}`);
+    }
+
+    return res.json();
 }
 
 function otpEmailTemplate(name, otp) {
