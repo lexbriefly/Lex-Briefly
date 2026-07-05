@@ -121,8 +121,32 @@
                             </div>
                         </div>
 
+                        <!-- Internship-specific fields: only relevant when Content Type = Internship -->
+                        <div id="adminInternshipFields" class="hidden md:col-span-2 grid md:grid-cols-2 gap-4 border border-royal-blue/20 bg-royal-blue/5 rounded-xl p-4">
+                            <div>
+                                <label class="form-label" for="adminLocation">Location</label>
+                                <input class="form-input" type="text" id="adminLocation" name="location" placeholder="e.g. New Delhi / Remote">
+                            </div>
+                            <div>
+                                <label class="form-label" for="adminDurationWeeks">Time Period <span class="text-light-gray/50">(weeks)</span></label>
+                                <input class="form-input" type="number" min="1" id="adminDurationWeeks" name="durationWeeks" placeholder="e.g. 8">
+                            </div>
+                            <div>
+                                <label class="form-label" for="adminStipend">Allowance <span class="text-light-gray/50">(₹)</span></label>
+                                <input class="form-input" type="number" min="0" id="adminStipend" name="stipend" placeholder="e.g. 10000">
+                            </div>
+                            <div>
+                                <label class="form-label" for="adminStartDate">Starting Date</label>
+                                <input class="form-input" type="date" id="adminStartDate" name="startDate">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="form-label" for="adminDeadline">Application Deadline <span class="text-light-gray/50">(optional)</span></label>
+                                <input class="form-input" type="date" id="adminDeadline" name="deadline">
+                            </div>
+                        </div>
+
                         <div>
-                            <label class="form-label" for="adminLink">External Link <span class="text-light-gray/50">(optional)</span></label>
+                            <label class="form-label" for="adminLink"><span id="adminLinkFieldLabel">External Link</span> <span class="text-light-gray/50">(optional)</span></label>
                             <input class="form-input" type="url" id="adminLink" name="link" placeholder="https://...">
                         </div>
                         <div class="md:col-span-2">
@@ -131,16 +155,8 @@
                         </div>
 
                         <details class="md:col-span-2 text-sm">
-                            <summary class="cursor-pointer text-light-gray hover:text-white-text">Type-specific fields (internships, news, cases)</summary>
+                            <summary class="cursor-pointer text-light-gray hover:text-white-text">Type-specific fields (news, cases)</summary>
                             <div class="mt-3 grid md:grid-cols-2 gap-3">
-                                <div>
-                                    <label class="form-label" for="adminDeadline">Internship Deadline</label>
-                                    <input class="form-input" type="date" id="adminDeadline" name="deadline">
-                                </div>
-                                <div>
-                                    <label class="form-label" for="adminLocation">Internship Location</label>
-                                    <input class="form-input" type="text" id="adminLocation" name="location">
-                                </div>
                                 <div>
                                     <label class="form-label" for="adminPublishedDate">News Published Date</label>
                                     <input class="form-input" type="date" id="adminPublishedDate" name="publishedDate">
@@ -155,6 +171,7 @@
                                 </div>
                             </div>
                         </details>
+
 
                         <div class="md:col-span-2">
                             <button type="submit" class="btn-primary w-full md:w-auto px-8 py-3 rounded-xl font-semibold text-sm">
@@ -279,13 +296,18 @@
             const SUBJECTS_BY_SEMESTER = <%- JSON.stringify(subjectsBySemester) %>;
             const adminTypeSelect = document.getElementById('adminType');
             const adminTileFields = document.getElementById('adminResourceTileFields');
+            const adminInternshipFields = document.getElementById('adminInternshipFields');
+            const adminLinkFieldLabel = document.getElementById('adminLinkFieldLabel');
             const adminSemesterSelect = document.getElementById('adminSemester');
             const adminSubjectSelect = document.getElementById('adminSubjectCode');
 
             function toggleAdminResourceFields() {
-                if (adminTypeSelect && adminTileFields) {
-                    adminTileFields.classList.toggle('hidden', adminTypeSelect.value !== 'resource');
-                }
+                if (!adminTypeSelect) return;
+                const isResource = adminTypeSelect.value === 'resource';
+                const isInternship = adminTypeSelect.value === 'internship';
+                if (adminTileFields) adminTileFields.classList.toggle('hidden', !isResource);
+                if (adminInternshipFields) adminInternshipFields.classList.toggle('hidden', !isInternship);
+                if (adminLinkFieldLabel) adminLinkFieldLabel.textContent = isInternship ? 'Apply Link' : 'External Link';
             }
             function populateAdminSubjects() {
                 const subjects = SUBJECTS_BY_SEMESTER[adminSemesterSelect.value] || [];

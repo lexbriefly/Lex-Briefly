@@ -1,0 +1,90 @@
+<%
+/* Expects: item (Content doc, lean) with type === 'internship' */
+const meta = item.meta || {};
+const fmtDate = (d) => {
+    if (!d) return null;
+    const dt = new Date(d);
+    if (isNaN(dt.getTime())) return null;
+    return dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+};
+const startDateLabel = fmtDate(meta.startDate);
+const deadlineLabel = fmtDate(meta.deadline);
+const allowanceLabel = (meta.stipend !== undefined && meta.stipend !== null && meta.stipend !== '')
+    ? `₹${Number(meta.stipend).toLocaleString('en-IN')}` : null;
+const durationLabel = (meta.durationWeeks !== undefined && meta.durationWeeks !== null && meta.durationWeeks !== '')
+    ? `${meta.durationWeeks} week${Number(meta.durationWeeks) === 1 ? '' : 's'}` : null;
+%>
+<div class="glass-card rounded-2xl p-6 flex flex-col group reveal" data-name="<%= item.title %>">
+
+    <div class="flex items-start justify-between mb-3">
+        <div class="w-11 h-11 rounded-xl bg-royal-blue/15 border border-royal-blue/20 flex items-center justify-center shrink-0">
+            <i class="ph-fill ph-briefcase text-xl text-gold"></i>
+        </div>
+        <% if (deadlineLabel) { %>
+            <span class="text-[11px] font-semibold bg-royal-yellow/15 text-royal-yellow rounded-full px-2.5 py-1 whitespace-nowrap">
+                Apply by <%= deadlineLabel %>
+            </span>
+        <% } %>
+    </div>
+
+    <h3 class="text-lg font-bold text-white-text font-heading leading-snug group-hover:text-gold transition-colors mb-1"><%= item.title %></h3>
+    <% if (item.subtitle) { %>
+        <p class="text-sm text-light-gray/80 mb-4"><%= item.subtitle %></p>
+    <% } %>
+
+    <!-- Location / Duration / Allowance / Starting Date -->
+    <div class="grid grid-cols-2 gap-3 mb-4 text-sm">
+        <div class="flex items-start gap-2">
+            <i class="ph ph-map-pin text-royal-blue mt-0.5"></i>
+            <div>
+                <p class="text-[11px] uppercase tracking-wide text-light-gray/50">Location</p>
+                <p class="text-white-text font-medium"><%= meta.location || '—' %></p>
+            </div>
+        </div>
+        <div class="flex items-start gap-2">
+            <i class="ph ph-calendar-blank text-royal-blue mt-0.5"></i>
+            <div>
+                <p class="text-[11px] uppercase tracking-wide text-light-gray/50">Duration</p>
+                <p class="text-white-text font-medium"><%= durationLabel || '—' %></p>
+            </div>
+        </div>
+        <div class="flex items-start gap-2">
+            <i class="ph ph-currency-inr text-royal-blue mt-0.5"></i>
+            <div>
+                <p class="text-[11px] uppercase tracking-wide text-light-gray/50">Allowance</p>
+                <p class="text-white-text font-medium"><%= allowanceLabel || 'Unpaid / N.A.' %></p>
+            </div>
+        </div>
+        <div class="flex items-start gap-2">
+            <i class="ph ph-rocket-launch text-royal-blue mt-0.5"></i>
+            <div>
+                <p class="text-[11px] uppercase tracking-wide text-light-gray/50">Starting Date</p>
+                <p class="text-white-text font-medium"><%= startDateLabel || '—' %></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="h-px w-full bg-gold/10 mb-4"></div>
+
+    <% if (item.description) { %>
+        <p class="text-sm text-light-gray/80 leading-relaxed mb-5 line-clamp-4"><%= item.description %></p>
+    <% } %>
+
+    <div class="mt-auto">
+        <% if (item.link) { %>
+            <a href="<%= item.link %>" target="_blank" rel="noopener" class="btn-primary w-full py-2.5 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2">
+                Apply Now <i class="ph ph-arrow-up-right"></i>
+            </a>
+        <% } else if (item.fileUrl) { %>
+            <a href="<%= item.fileUrl %>" target="_blank" rel="noopener" class="btn-primary w-full py-2.5 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2">
+                Apply Now <i class="ph ph-arrow-up-right"></i>
+            </a>
+        <% } else if (item.fileName) { %>
+            <a href="/uploads/<%= item.fileName %>" target="_blank" rel="noopener" class="btn-primary w-full py-2.5 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2">
+                Apply Now <i class="ph ph-arrow-up-right"></i>
+            </a>
+        <% } else { %>
+            <span class="block text-center text-xs text-light-gray/50 py-2">Application link coming soon</span>
+        <% } %>
+    </div>
+</div>

@@ -163,6 +163,7 @@ exports.createContent = async (req, res) => {
     try {
         const {
             type, title, subtitle, description, category, tags, link, deadline, location, publishedDate, court, citation,
+            durationWeeks, stipend, startDate,
             semester, subjectCode, resourceCategory, template,
         } = req.body;
 
@@ -193,7 +194,16 @@ exports.createContent = async (req, res) => {
             link,
             fileName: req.file && !fileUrl ? req.file.filename : undefined,
             fileUrl: fileUrl || undefined,
-            meta: { deadline: deadline || undefined, location, publishedDate: publishedDate || undefined, court, citation },
+            meta: {
+                deadline: deadline || undefined,
+                location,
+                durationWeeks: durationWeeks !== undefined && durationWeeks !== '' ? Number(durationWeeks) : undefined,
+                stipend: stipend !== undefined && stipend !== '' ? Number(stipend) : undefined,
+                startDate: startDate || undefined,
+                publishedDate: publishedDate || undefined,
+                court,
+                citation,
+            },
             semester: type === 'resource' ? semester : undefined,
             subjectCode: type === 'resource' ? subjectCode : undefined,
             subjectName: type === 'resource' ? subjectName : undefined,

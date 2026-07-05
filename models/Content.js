@@ -1,5 +1,11 @@
 const mongoose = require('mongoose');
 
+/**
+ * A single generic schema powers every content page (Resources, Books & Bare
+ * Acts, Case Laws, Internships, News). The `type` field determines which
+ * page the item appears on, so CMS staff use one unified upload form and
+ * the admin gets one unified moderation queue.
+ */
 const contentSchema = new mongoose.Schema(
     {
         type: {
@@ -41,8 +47,11 @@ const contentSchema = new mongoose.Schema(
 
         // Optional extra metadata that only applies to some types
         meta: {
-            deadline: Date, // internships
+            deadline: Date, // internships — last date to apply
             location: String, // internships
+            durationWeeks: Number, // internships — preferred duration, in weeks
+            stipend: Number, // internships — allowance, in Rupees
+            startDate: Date, // internships — when the internship begins
             publishedDate: Date, // news
             court: String, // cases
             citation: String, // cases
