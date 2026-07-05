@@ -1,15 +1,28 @@
 /* ==========================================================================
-   LEX Briefly — Shared Styles
-   Extracted from the inline <style> blocks that were duplicated across
-   index.html, books.html, cases.html, internship.html, news.html and
-   resource.html.
+    LEX Briefly — Shared Styles
    ========================================================================== */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html {
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+}
 
 body {
     background-color: #0B0B0F;
     color: #F8FAFC;
     font-family: 'Inter', sans-serif;
     overflow-x: hidden;
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+img, svg, video, canvas {
+    max-width: 100%;
+    height: auto;
 }
 
 /* Custom Scrollbar */
@@ -26,10 +39,14 @@ body {
     border: 1px solid rgba(212, 175, 55, 0.15);
     transition: all 0.3s ease;
 }
-.glass-card:hover {
-    border-color: rgba(30, 77, 255, 0.5);
-    box-shadow: 0 10px 30px -10px rgba(30, 77, 255, 0.3);
-    transform: translateY(-5px);
+/* Hover-only lift effect: scoped to devices with a real pointer so it doesn't
+   get "stuck" on tap for touchscreens (phones/tablets). */
+@media (hover: hover) and (pointer: fine) {
+    .glass-card:hover {
+        border-color: rgba(30, 77, 255, 0.5);
+        box-shadow: 0 10px 30px -10px rgba(30, 77, 255, 0.3);
+        transform: translateY(-5px);
+    }
 }
 
 .glass-header {
@@ -58,10 +75,12 @@ body {
     color: #F8FAFC;
     transition: all 0.3s ease;
 }
-.btn-primary:hover {
-    background-color: #FFD54A;
-    color: #0B0B0F;
-    box-shadow: 0 0 15px rgba(255, 213, 74, 0.4);
+@media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover {
+        background-color: #FFD54A;
+        color: #0B0B0F;
+        box-shadow: 0 0 15px rgba(255, 213, 74, 0.4);
+    }
 }
 
 .btn-secondary {
@@ -70,11 +89,18 @@ body {
     border: 1px solid #D4AF37;
     transition: all 0.3s ease;
 }
-.btn-secondary:hover {
-    background-color: #D4AF37;
-    color: #0B0B0F;
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+@media (hover: hover) and (pointer: fine) {
+    .btn-secondary:hover {
+        background-color: #D4AF37;
+        color: #0B0B0F;
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+    }
 }
+
+/* Buttons still need a visible pressed state on touch devices since :hover
+   won't fire there. */
+.btn-primary:active { background-color: #FFD54A; color: #0B0B0F; }
+.btn-secondary:active { background-color: #D4AF37; color: #0B0B0F; }
 
 /* Scroll Reveal Animations */
 .reveal {
@@ -114,7 +140,7 @@ body {
 }
 
 /* ==========================================================================
-   Auth pages (login / signup / OTP / CMS / Admin)
+    Auth pages (login / signup / OTP / CMS / Admin)
    ========================================================================== */
 .auth-shell {
     min-height: 100vh;
@@ -178,7 +204,7 @@ body {
 }
 
 /* ==========================================================================
-   Dashboards (Student / CMS / Admin)
+    Dashboards (Student / CMS / Admin)
    ========================================================================== */
 .dash-card {
     background: rgba(7, 26, 53, 0.45);
@@ -219,3 +245,62 @@ table.data-table td {
     vertical-align: middle;
 }
 table.data-table tr:hover td { background: rgba(30, 77, 255, 0.05); }
+
+/* ==========================================================================
+    Responsive hardening — applies across every page (home, resources, books,
+    cases, internships, news, auth, dashboards).
+   ========================================================================== */
+
+input, textarea, select {
+    font-size: max(16px, 1rem);
+}
+@media (min-width: 768px) {
+    .form-input { font-size: 0.9rem; }
+}
+
+/* Give horizontally-scrollable tables native momentum scrolling on iOS. */
+.dash-card.overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+}
+@media (max-width: 767px) {
+    table.data-table { font-size: 0.78rem; }
+    table.data-table th,
+    table.data-table td { padding: 0.6rem 0.75rem; white-space: nowrap; }
+}
+
+/* Cards and shells feel cramped with full desktop padding on small phones —
+   tighten things up below the sm breakpoint. */
+@media (max-width: 639px) {
+    .dash-card { padding: 1.1rem; }
+    .auth-shell { padding: 1.5rem 0.85rem; }
+    .glass-card.rounded-2xl { border-radius: 1rem; }
+}
+
+@media (max-width: 380px) {
+    .auth-card { max-width: 100%; }
+    .otp-input { letter-spacing: 0.35em; font-size: 1.25rem; }
+    table.data-table th,
+    table.data-table td { padding: 0.5rem 0.6rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    .reveal {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 2px solid #1E4DFF;
+    outline-offset: 2px;
+}
