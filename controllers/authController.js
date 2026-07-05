@@ -34,7 +34,7 @@ exports.studentSignup = async (req, res) => {
     if (errMsg) return res.status(400).render('auth/student-signup', { error: errMsg, old: req.body });
 
     try {
-        const { name, email, studentId, course, semester, password } = req.body;
+        const { name, email, college, password } = req.body;
         const existing = await User.findOne({ email: email.toLowerCase() });
 
         if (existing) {
@@ -71,9 +71,7 @@ exports.studentSignup = async (req, res) => {
         const user = new User({
             name,
             email: email.toLowerCase(),
-            studentId,
-            course,
-            semester: semester || undefined,
+            college,
             password,
             role: 'student',
             status: 'active',

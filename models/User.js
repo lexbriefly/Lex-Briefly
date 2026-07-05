@@ -23,9 +23,7 @@ const userSchema = new mongoose.Schema(
         },
 
         // Student-only fields
-        studentId: { type: String, trim: true, sparse: true },
-        course: { type: String, trim: true },
-        semester: { type: Number, min: 1, max: 10 },
+        college: { type: String, trim: true },
 
         // CMS accounts are provisioned by an Admin, never self-signup
         createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },

@@ -11,9 +11,6 @@ async function sendEmail({ to, subject, html, text }) {
     }
 
     if (!process.env.EMAIL_FROM_ADDRESS) {
-        // Brevo rejects requests with no sender address, but the resulting
-        // error is a generic 400 that doesn't make it obvious what to fix.
-        // Fail fast with a clear message instead.
         throw new Error(
             'EMAIL_FROM_ADDRESS is not set in .env. Set it to an email address you have verified as a sender in your Brevo account (Settings > Senders & IP).'
         );
@@ -40,9 +37,6 @@ async function sendEmail({ to, subject, html, text }) {
             }),
         });
     } catch (networkErr) {
-        // fetch() itself throws on DNS/connection failures (no internet
-        // access, firewall blocking api.brevo.com, etc). Surface that
-        // distinctly from an API-level rejection so it's clear where to look.
         throw new Error(`Could not reach Brevo API (network error): ${networkErr.message}`);
     }
 

@@ -32,29 +32,17 @@
                     <div>
                         <label class="form-label" for="name">Full Name</label>
                         <input class="form-input" type="text" id="name" name="name" required
-                               value="<%= typeof old !== 'undefined' && old.name ? old.name : '' %>" placeholder="Aarav Sharma">
+                            value="<%= typeof old !== 'undefined' && old.name ? old.name : '' %>" placeholder="Your full name">
                     </div>
                     <div>
                         <label class="form-label" for="email">Email Address</label>
                         <input class="form-input" type="email" id="email" name="email" required
-                               value="<%= typeof old !== 'undefined' && old.email ? old.email : '' %>" placeholder="you@example.com">
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="form-label" for="studentId">Student / Roll ID</label>
-                            <input class="form-input" type="text" id="studentId" name="studentId" required
-                                   value="<%= typeof old !== 'undefined' && old.studentId ? old.studentId : '' %>" placeholder="LLB2024-045">
-                        </div>
-                        <div>
-                            <label class="form-label" for="semester">Semester</label>
-                            <input class="form-input" type="number" id="semester" name="semester" min="1" max="10"
-                                   value="<%= typeof old !== 'undefined' && old.semester ? old.semester : '' %>" placeholder="3">
-                        </div>
+                            value="<%= typeof old !== 'undefined' && old.email ? old.email : '' %>" placeholder="you@example.com">
                     </div>
                     <div>
-                        <label class="form-label" for="course">Course</label>
-                        <input class="form-input" type="text" id="course" name="course"
-                               value="<%= typeof old !== 'undefined' && old.course ? old.course : '' %>" placeholder="LL.B. (Hons)">
+                        <label class="form-label" for="college">College</label>
+                        <input class="form-input" type="text" id="college" name="college"
+                            value="<%= typeof old !== 'undefined' && old.college ? old.college : '' %>" placeholder="College Name">
                     </div>
                     <div>
                         <label class="form-label" for="password">Password</label>

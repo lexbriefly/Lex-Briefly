@@ -28,7 +28,6 @@ router.post(
     [
         body('name').trim().notEmpty().withMessage('Name is required.'),
         body('email').isEmail().withMessage('Enter a valid email.'),
-        body('studentId').trim().notEmpty().withMessage('Student / Roll ID is required.'),
         body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters.')
             .matches(/\d/).withMessage('Password must contain at least one number.'),
         body('confirmPassword').custom((value, { req }) => value === req.body.password).withMessage('Passwords do not match.'),
