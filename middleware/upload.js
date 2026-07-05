@@ -1,13 +1,14 @@
 const multer = require('multer');
 const path = require('path');
+const { blobEnabled } = require('../utils/fileToBlob');
 
-const storage = process.env.VERCEL
+const storage = blobEnabled()
     ? multer.memoryStorage()
     : multer.diskStorage({
         destination: (req, file, cb) => cb(null, path.join(__dirname, '..', 'uploads')),
         filename: (req, file, cb) => {
-        const safe = file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, '_');
-        cb(null, `${Date.now()}-${safe}`);
+            const safe = file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+            cb(null, `${Date.now()}-${safe}`);
         },
     });
 

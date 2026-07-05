@@ -38,6 +38,16 @@ app.set('views', path.join(__dirname, 'views'));
 // ---- Static assets ----
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(uploadsDir));
+// If a locally-stored file 404s (e.g. it was uploaded before a redeploy or
+// restart wiped the disk, which happens on hosts without a persistent disk
+// like Render's free tier), say so plainly instead of falling through to
+// the generic "Page Not Found" screen.
+app.use('/uploads', (req, res) => {
+    res.status(404).render('error', {
+        title: 'File Unavailable',
+        message: 'This file is no longer available on the server. Please ask the CMS team to re-upload it.',
+    });
+});
 
 // ---- Attach logged-in user (if any) to every request/view ----
 app.use(attachUser);

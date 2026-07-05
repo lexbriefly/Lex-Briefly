@@ -41,9 +41,12 @@ const contentSchema = new mongoose.Schema(
             default: 'link',
         },
 
-        // External link or uploaded file path (served from /uploads)
+        // External link pasted by CMS/admin (e.g. YouTube link, external PDF)
         link: { type: String, trim: true },
+        // Uploaded file stored on disk, served from /uploads/<fileName>
         fileName: { type: String, trim: true },
+        // Uploaded file stored on Vercel Blob (or any cloud storage), a full public URL
+        fileUrl: { type: String, trim: true },
 
         // Optional extra metadata that only applies to some types
         meta: {
