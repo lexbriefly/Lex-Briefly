@@ -12,6 +12,7 @@ router.get('/cases.html', content.cases);
 router.get('/case/:id', content.caseDetail);
 router.get('/internship.html', content.internships);
 router.get('/news.html', content.news);
+router.get('/aboutus.html', content.about);
 
 router.get('/dashboard', requireAuth, content.studentDashboard);
 

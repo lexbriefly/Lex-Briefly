@@ -111,6 +111,10 @@ exports.news = async (req, res) => {
     res.render('news', { active: 'news', items });
 };
 
+exports.about = async (req, res) => {
+    res.render('aboutus', { active: 'about' });
+};
+
 exports.studentDashboard = async (req, res) => {
     res.render('dashboard/student-dashboard', { active: 'dashboard' });
 };
