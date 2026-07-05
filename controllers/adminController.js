@@ -1,37 +1,19 @@
 const crypto = require('crypto');
 const User = require('../models/User');
 const Content = require('../models/Content');
-const AuditLog = require('../models/AuditLog');
+const AuditLog = require('../models/AuditLog'); // read-only here: used by exports.auditLog to show login-security history
 const { sendEmail, cmsCredentialsTemplate } = require('../utils/email');
 const { fileToBlob } = require('../utils/fileToBlob');
 const catalog = require('../utils/subjectsCatalog');
 
 const CONTENT_TYPES = ['resource', 'book', 'bareact', 'case', 'internship', 'news'];
 
-async function log(action, req, extra = {}) {
-    try {
-        await AuditLog.create({
-            action,
-            performedBy: req.user?._id,
-            performedByRole: req.user?.role,
-            performedByLabel: req.user?.email,
-            details: extra.details,
-            ip: req.ip,
-            targetType: extra.targetType,
-            targetId: extra.targetId,
-        });
-    } catch (e) {
-        console.error('[AuditLog] failed to write:', e.message);
-    }
-}
-
 exports.dashboard = async (req, res) => {
-    const [pendingContent, cmsAccounts, studentCount, contentStats, recentLogs] = await Promise.all([
+    const [pendingContent, cmsAccounts, studentCount, contentStats] = await Promise.all([
         Content.find({ status: 'pending' }).populate('uploadedBy', 'name email').sort({ createdAt: -1 }).limit(50),
         User.find({ role: 'cms' }).sort({ createdAt: -1 }),
         User.countDocuments({ role: 'student' }),
         Content.aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }]),
-        AuditLog.find().sort({ createdAt: -1 }).limit(30),
     ]);
 
     const statusCounts = { pending: 0, published: 0, rejected: 0 };
@@ -42,7 +24,6 @@ exports.dashboard = async (req, res) => {
         cmsAccounts,
         studentCount,
         statusCounts,
-        recentLogs,
         contentTypes: CONTENT_TYPES,
         semesters: catalog.SEMESTERS,
         subjectsBySemester: catalog.SUBJECTS,
@@ -52,6 +33,7 @@ exports.dashboard = async (req, res) => {
         success: req.query.success || null,
     });
 };
+
 
 // ---- CMS account provisioning (Admin issues CMS credentials) ----
 exports.createCmsAccount = async (req, res) => {
@@ -77,8 +59,6 @@ exports.createCmsAccount = async (req, res) => {
         const tpl = cmsCredentialsTemplate(name, cmsUser.email, tempPassword);
         await sendEmail({ to: cmsUser.email, ...tpl });
 
-        await log('CMS_ACCOUNT_CREATED', req, { targetType: 'User', targetId: cmsUser._id, details: cmsUser.email });
-
         res.redirect('/admin/dashboard?success=' + encodeURIComponent(`CMS account created for ${cmsUser.email}. Credentials emailed.`));
     } catch (err) {
         console.error(err);
@@ -92,10 +72,6 @@ exports.toggleCmsStatus = async (req, res) => {
 
     cmsUser.status = cmsUser.status === 'active' ? 'suspended' : 'active';
     await cmsUser.save();
-
-    await log(cmsUser.status === 'active' ? 'CMS_ACCOUNT_REACTIVATED' : 'CMS_ACCOUNT_SUSPENDED', req, {
-        targetType: 'User', targetId: cmsUser._id, details: cmsUser.email,
-    });
 
     res.json({ success: true, status: cmsUser.status });
 };
@@ -112,8 +88,6 @@ exports.resetCmsPassword = async (req, res) => {
     const tpl = cmsCredentialsTemplate(cmsUser.name, cmsUser.email, tempPassword);
     await sendEmail({ to: cmsUser.email, ...tpl });
 
-    await log('CMS_PASSWORD_RESET', req, { targetType: 'User', targetId: cmsUser._id, details: 'Admin-initiated reset' });
-
     res.json({ success: true });
 };
 
@@ -128,7 +102,6 @@ exports.publishContent = async (req, res) => {
     content.rejectionReason = undefined;
     await content.save();
 
-    await log('CONTENT_PUBLISHED', req, { targetType: 'Content', targetId: content._id, details: content.title });
     res.json({ success: true });
 };
 
@@ -142,7 +115,6 @@ exports.rejectContent = async (req, res) => {
     content.rejectionReason = req.body.reason || 'Did not meet publishing guidelines.';
     await content.save();
 
-    await log('CONTENT_REJECTED', req, { targetType: 'Content', targetId: content._id, details: content.title });
     res.json({ success: true });
 };
 
@@ -215,8 +187,6 @@ exports.createContent = async (req, res) => {
             reviewedAt: new Date(),
         });
 
-        await log('CONTENT_CREATED', req, { targetType: 'Content', targetId: content._id, details: `${type}: ${title} (admin, auto-published)` });
-
         res.redirect('/admin/dashboard?success=' + encodeURIComponent(`"${title}" published.`));
     } catch (err) {
         console.error(err);
@@ -228,6 +198,5 @@ exports.deleteContent = async (req, res) => {
     const content = await Content.findByIdAndDelete(req.params.id);
     if (!content) return res.status(404).json({ success: false, message: 'Not found.' });
 
-    await log('CONTENT_DELETED', req, { targetType: 'Content', targetId: content._id, details: `${content.title} (deleted by admin)` });
     res.json({ success: true });
 };

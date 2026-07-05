@@ -2,26 +2,8 @@ const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const Content = require('../models/Content');
 const User = require('../models/User');
-const AuditLog = require('../models/AuditLog');
 const { fileToBlob } = require('../utils/fileToBlob');
 const catalog = require('../utils/subjectsCatalog');
-
-async function log(action, req, extra = {}) {
-    try {
-        await AuditLog.create({
-            action,
-            performedBy: req.user?._id,
-            performedByRole: req.user?.role,
-            performedByLabel: req.user?.email,
-            details: extra.details,
-            ip: req.ip,
-            targetType: extra.targetType,
-            targetId: extra.targetId,
-        });
-    } catch (e) {
-        console.error('[AuditLog] failed to write:', e.message);
-    }
-}
 
 const CONTENT_TYPES = ['resource', 'book', 'bareact', 'case', 'internship', 'news'];
 
@@ -69,7 +51,6 @@ exports.changePassword = async (req, res) => {
     user.password = newPassword;
     user.mustChangePassword = false;
     await user.save();
-    await log('CMS_PASSWORD_RESET', req, { targetType: 'User', targetId: user._id, details: 'Self-service password change' });
 
     res.redirect('/cms/dashboard');
 };
@@ -155,8 +136,6 @@ exports.createContent = async (req, res) => {
             status: 'pending',
         });
 
-        await log('CONTENT_CREATED', req, { targetType: 'Content', targetId: content._id, details: `${type}: ${title}` });
-
         res.redirect('/cms/dashboard?success=Content submitted for admin review.');
     } catch (err) {
         console.error(err);
@@ -182,8 +161,6 @@ exports.updateContent = async (req, res) => {
     content.reviewedAt = undefined;
     await content.save();
 
-    await log('CONTENT_UPDATED', req, { targetType: 'Content', targetId: content._id, details: content.title });
-
     res.json({ success: true, content });
 };
 
@@ -191,6 +168,5 @@ exports.deleteContent = async (req, res) => {
     const content = await Content.findOneAndDelete({ _id: req.params.id, uploadedBy: req.user._id });
     if (!content) return res.status(404).json({ success: false, message: 'Not found.' });
 
-    await log('CONTENT_DELETED', req, { targetType: 'Content', targetId: content._id, details: content.title });
     res.json({ success: true });
 };

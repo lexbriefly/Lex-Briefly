@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 
 /**
- * Every meaningful action (content upload, edit, publish, reject, account
- * creation/suspension, login) is written here so the Admin dashboard can
- * show a full monitoring trail of what every CMS login has done.
+ * Login-security trail only: signup, email verification, and successful /
+ * failed login attempts. Content moderation and CMS-account actions are
+ * NOT logged here — Content already carries uploadedBy/reviewedBy/status/
+ * reviewedAt, which covers "who did what" for that side of the system.
  */
 const auditLogSchema = new mongoose.Schema(
     {
@@ -11,15 +12,6 @@ const auditLogSchema = new mongoose.Schema(
             type: String,
             required: true,
             enum: [
-                'CONTENT_CREATED',
-                'CONTENT_UPDATED',
-                'CONTENT_DELETED',
-                'CONTENT_PUBLISHED',
-                'CONTENT_REJECTED',
-                'CMS_ACCOUNT_CREATED',
-                'CMS_ACCOUNT_SUSPENDED',
-                'CMS_ACCOUNT_REACTIVATED',
-                'CMS_PASSWORD_RESET',
                 'USER_LOGIN',
                 'USER_LOGIN_FAILED',
                 'USER_SIGNUP',
