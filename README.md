@@ -12,6 +12,7 @@ LEX-Briefly/
 ├── config/
 │   └── db.js                 # Mongo connection
 ├── middleware/
+│   ├── upload.js
 │   └── auth.js                # attachUser / requireAuth / requireRole / JWT
 ├── models/
 │   ├── User.js
@@ -29,13 +30,17 @@ LEX-Briefly/
 │   └── adminRoutes.js
 ├── utils/
 │   ├── email.js
-│   └── seedAdmin.js
+│   ├── fileToBlob.js
+│   ├── seedAdmin.js
+│   └── subjectsCatalog.js
 ├── views/                     # EJS templates (frontend, server-rendered)
 │   ├── error.ejs
 │   ├── index.ejs
 │   ├── books.ejs
 │   ├── cases.ejs
+│   ├── case-detail.ejs
 │   ├── resource.ejs
+│   ├── resource-detail.ejs
 │   ├── internship.ejs
 │   ├── news.ejs
 │   ├── auth/
@@ -56,11 +61,13 @@ LEX-Briefly/
 │       ├── header.ejs
 │       ├── footer.ejs
 │       ├── sidebar.ejs
+│       ├── internship-card.ejs
 │       ├── mobile-drawer.ejs
 │       ├── scripts.ejs
 │       └── content-card.ejs
 └── public/                    # static assets served at /css, /js
     ├── css/main.css
+    ├── images
     └── js/
         ├── main.js
         ├── page-search.js
