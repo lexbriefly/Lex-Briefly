@@ -9,6 +9,7 @@ router.get('/resource.html', content.resources);
 router.get('/resource/:semester/:subjectCode/:category', content.resourceDetail);
 router.get('/books.html', content.books);
 router.get('/cases.html', content.cases);
+router.get('/case/:id', content.caseDetail);
 router.get('/internship.html', content.internships);
 router.get('/news.html', content.news);
 

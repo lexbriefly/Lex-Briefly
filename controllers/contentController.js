@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Content = require('../models/Content');
 const catalog = require('../utils/subjectsCatalog');
 
@@ -82,6 +83,22 @@ exports.books = async (req, res) => {
 exports.cases = async (req, res) => {
     const items = await published('case');
     res.render('cases', { active: 'cases', items });
+};
+
+exports.caseDetail = async (req, res) => {
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+        return res.status(404).render('error', { title: 'Not Found', message: 'That case law does not exist.' });
+    }
+
+    const item = await Content.findOne({ _id: id, type: 'case', status: 'published' }).lean();
+
+    if (!item) {
+        return res.status(404).render('error', { title: 'Not Found', message: 'That case law does not exist or is not published yet.' });
+    }
+
+    res.render('case-detail', { active: 'cases', item });
 };
 
 exports.internships = async (req, res) => {

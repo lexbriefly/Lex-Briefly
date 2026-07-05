@@ -157,20 +157,28 @@
                                     <input class="form-input" type="file" id="file" name="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
                                 </div>
 
+                                <!-- Case Law-specific fields: only relevant when Content Type = Case -->
+                                <div id="caseFields" class="hidden space-y-4 border border-royal-blue/20 bg-royal-blue/5 rounded-xl p-4">
+                                    <p class="text-xs text-light-gray/70 flex items-center gap-2"><i class="ph ph-info text-royal-blue"></i> These appear on the case's detail page (opened by clicking its heading).</p>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="form-label" for="court">Court</label>
+                                            <input class="form-input" type="text" id="court" name="court" placeholder="e.g. Supreme Court of India">
+                                        </div>
+                                        <div>
+                                            <label class="form-label" for="citation">Citation</label>
+                                            <input class="form-input" type="text" id="citation" name="citation" placeholder="e.g. (1973) 4 SCC 225">
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-light-gray/60">Use the <b>Description</b> field above for the full case summary — it's shown in full on the detail page.</p>
+                                </div>
+
                                 <details class="text-sm">
-                                    <summary class="cursor-pointer text-light-gray hover:text-white-text">Type-specific fields (news, cases)</summary>
+                                    <summary class="cursor-pointer text-light-gray hover:text-white-text">Type-specific fields (news)</summary>
                                     <div class="mt-3 space-y-3">
                                         <div>
                                             <label class="form-label" for="publishedDate">News Published Date</label>
                                             <input class="form-input" type="date" id="publishedDate" name="publishedDate">
-                                        </div>
-                                        <div>
-                                            <label class="form-label" for="court">Case Court</label>
-                                            <input class="form-input" type="text" id="court" name="court">
-                                        </div>
-                                        <div>
-                                            <label class="form-label" for="citation">Case Citation</label>
-                                            <input class="form-input" type="text" id="citation" name="citation">
                                         </div>
                                     </div>
                                 </details>
@@ -239,12 +247,16 @@
             const fileField = document.getElementById('fileField');
             const fileInput = document.getElementById('file');
 
+            const caseFields = document.getElementById('caseFields');
+
             function toggleResourceFields() {
                 const isResource = typeSelect.value === 'resource';
                 const isInternship = typeSelect.value === 'internship';
+                const isCase = typeSelect.value === 'case';
 
                 tileFields.classList.toggle('hidden', !isResource);
                 internshipFields.classList.toggle('hidden', !isInternship);
+                caseFields.classList.toggle('hidden', !isCase);
 
                 if (isResource) {
                     applyTemplate();
@@ -254,6 +266,12 @@
                     linkFieldLabel.textContent = 'Apply Link';
                     linkInput.placeholder = 'https://... (application form / careers page)';
                     linkFieldHint.textContent = '(shown as the "Apply Now" button)';
+                } else if (isCase) {
+                    linkField.classList.remove('hidden');
+                    fileField.classList.remove('hidden');
+                    linkFieldLabel.textContent = 'Judgment Link';
+                    linkInput.placeholder = 'https://... (link to the full judgment)';
+                    linkFieldHint.textContent = '(shown as "View Full Judgment" on the detail page)';
                 } else {
                     linkField.classList.remove('hidden');
                     fileField.classList.remove('hidden');
