@@ -1,8 +1,9 @@
 # LEX Briefly — Reorganized Project
 
-This is project reorganized into a standard Express + EJS + MongoDB
+This is a project into a standard Express + EJS + MongoDB format for helping student in their acedmic life.
 
-## Final structure
+This site help law student in manage the acedmic life and content related to theiir cources.
+## File structure
 
 ```
 LEX-Briefly/
