@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <% var pageTitle = item.title + ' | LEX Briefly'; %>
+    <%- include('partials/head') %>
+</head>
+<body class="flex bg-rich-black text-white-text selection:bg-royal-blue selection:text-white-text">
+
+    <%- include('partials/sidebar') %>
+    <%- include('partials/mobile-drawer') %>
+
+    <div id="mainContent" class="flex-1 transition-all duration-300 md:ml-64 relative min-h-screen">
+        <%- include('partials/header') %>
+
+        <main class="pt-24 pb-20 px-6 md:px-12 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-royal-blue/10 via-rich-black to-rich-black min-h-screen">
+
+            <nav class="max-w-3xl mx-auto mb-6 text-sm text-light-gray/70 flex items-center gap-2 flex-wrap">
+                <a href="/books.html" class="hover:text-royal-yellow transition-colors">Books & Bare Acts</a>
+                <i class="ph ph-caret-right text-xs"></i>
+                <span class="text-gold font-medium line-clamp-1"><%= item.title %></span>
+            </nav>
+
+            <article class="max-w-3xl mx-auto">
+                <div class="glass-card rounded-2xl p-8">
+                    <div class="flex items-start justify-between gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-royal-blue/15 border border-royal-blue/20 flex items-center justify-center shrink-0">
+                            <i class="ph-fill ph-gavel text-3xl text-gold"></i>
+                        </div>
+                        <% if (item.category) { %>
+                            <span class="text-xs font-semibold px-2.5 py-1 bg-deep-navy/60 text-light-gray rounded capitalize whitespace-nowrap"><%= item.category %></span>
+                        <% } %>
+                    </div>
+
+                    <h1 class="font-heading text-2xl md:text-3xl font-bold text-white-text mb-2"><%= item.title %></h1>
+
+                    <% if (item.subtitle) { %>
+                        <p class="text-sm text-light-gray/70 mb-4 flex items-center gap-1.5"><i class="ph ph-user"></i> <%= item.subtitle %></p>
+                    <% } %>
+
+                    <div class="flex flex-wrap gap-4 mb-6 text-sm">
+                        <% if (item.meta && item.meta.court) { %>
+                            <span class="flex items-center gap-1.5 text-light-gray"><i class="ph ph-bank text-royal-blue"></i> <%= item.meta.court %></span>
+                        <% } %>
+                        <% if (item.meta && item.meta.citation) { %>
+                            <span class="flex items-center gap-1.5 text-light-gray"><i class="ph ph-hash text-royal-blue"></i> <%= item.meta.citation %></span>
+                        <% } %>
+                        <span class="flex items-center gap-1.5 text-light-gray/60"><i class="ph ph-calendar-blank"></i> Published <%= new Date(item.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %></span>
+                    </div>
+
+                    <div class="h-px w-full bg-gold/10 mb-6"></div>
+
+                    <% if (item.description) { %>
+                        <p class="text-light-gray leading-relaxed whitespace-pre-line mb-6"><%= item.description %></p>
+                    <% } else { %>
+                        <p class="text-light-gray/50 italic mb-6">No further details have been added on this item yet.</p>
+                    <% } %>
+
+                    <% if (item.tags && item.tags.length) { %>
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            <% item.tags.forEach(function(tag) { %>
+                                <span class="text-xs px-3 py-1 rounded-full bg-royal-blue/10 text-royal-blue border border-royal-blue/20">#<%= tag %></span>
+                            <% }); %>
+                        </div>
+                    <% } %>
+
+                    <div class="flex flex-wrap items-center gap-3 pt-2">
+                        <% if (item.link) { %>
+                            <a href="<%= item.link %>" target="_blank" rel="noopener" class="btn-primary px-5 py-2.5 rounded-lg text-sm inline-flex items-center gap-2">
+                                <i class="ph ph-arrow-square-out"></i> View Full Details
+                            </a>
+                        <% } else if (item.fileUrl) { %>
+                            <a href="<%= item.fileUrl %>" target="_blank" rel="noopener" class="btn-primary px-5 py-2.5 rounded-lg text-sm inline-flex items-center gap-2">
+                                <i class="ph ph-download-simple"></i> Download
+                            </a>
+                        <% } else if (item.fileName) { %>
+                            <a href="/uploads/<%= item.fileName %>" target="_blank" rel="noopener" class="btn-primary px-5 py-2.5 rounded-lg text-sm inline-flex items-center gap-2">
+                                <i class="ph ph-download-simple"></i> Download
+                            </a>
+                        <% } %>
+                        <a href="/books.html" class="btn-secondary px-5 py-2.5 rounded-lg text-sm inline-flex items-center gap-2">
+                            <i class="ph ph-arrow-left"></i> Back to Books & Bare Acts
+                        </a>
+                    </div>
+                </div>
+            </article>
+        </main>
+
+        <%- include('partials/footer') %>
+    </div>
+
+    <%- include('partials/scripts') %>
+</body>
+</html>
