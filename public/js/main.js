@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (globalSearch) {
         globalSearch.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && globalSearch.value.trim()) {
-                window.location.href = `/resource.html?q=${encodeURIComponent(globalSearch.value.trim())}`;
+                window.location.href = `/resource?q=${encodeURIComponent(globalSearch.value.trim())}`;
             }
         });
     }

@@ -43,10 +43,10 @@
                         </p>
 
                         <div class="flex flex-wrap gap-4">
-                            <a href="/resource.html" class="btn-primary w-full sm:w-auto px-6 py-3.5 rounded-lg font-medium text-base inline-flex justify-center items-center gap-2">
+                            <a href="/resource" class="btn-primary w-full sm:w-auto px-6 py-3.5 rounded-lg font-medium text-base inline-flex justify-center items-center gap-2">
                                 <i class="ph ph-books text-xl"></i> Explore Resources
                             </a>
-                            <a href="/internship.html" class="btn-secondary w-full sm:w-auto px-6 py-3.5 rounded-lg font-medium text-base inline-flex justify-center items-center gap-2">
+                            <a href="/internship" class="btn-secondary w-full sm:w-auto px-6 py-3.5 rounded-lg font-medium text-base inline-flex justify-center items-center gap-2">
                                 <i class="ph ph-briefcase text-xl"></i> Explore Internships
                             </a>
                         </div>
@@ -96,7 +96,7 @@
                             <p class="text-light-gray mb-8 leading-relaxed">
                                 Access semester-wise notes, books, bare acts, previous year papers, and comprehensively organized academic materials.
                             </p>
-                            <a href="/resource.html" class="inline-flex items-center gap-2 text-royal-yellow font-medium hover:gap-4 transition-all">
+                            <a href="/resource" class="inline-flex items-center gap-2 text-royal-yellow font-medium hover:gap-4 transition-all">
                                 Explore Resources <i class="ph ph-arrow-right"></i>
                             </a>
                         </div>
@@ -108,7 +108,7 @@
                             <p class="text-light-gray mb-8 leading-relaxed">
                                 Discover internship opportunities with top law firms, supreme/high courts, NGOs, legal startups, and prominent organizations.
                             </p>
-                            <a href="/internship.html" class="inline-flex items-center gap-2 text-royal-yellow font-medium hover:gap-4 transition-all">
+                            <a href="/internship" class="inline-flex items-center gap-2 text-royal-yellow font-medium hover:gap-4 transition-all">
                                 View Opportunities <i class="ph ph-arrow-right"></i>
                             </a>
                         </div>
@@ -124,7 +124,7 @@
                             <h2 class="font-heading text-3xl md:text-5xl font-bold mb-3">Latest Updates</h2>
                             <p class="text-light-gray">Stay informed with the newest additions and announcements.</p>
                         </div>
-                        <a href="/news.html" class="hidden md:inline-flex items-center gap-2 text-light-gray hover:text-royal-yellow transition-colors border-b border-transparent hover:border-royal-yellow pb-1">
+                        <a href="/news" class="hidden md:inline-flex items-center gap-2 text-light-gray hover:text-royal-yellow transition-colors border-b border-transparent hover:border-royal-yellow pb-1">
                             View All <i class="ph ph-arrow-right"></i>
                         </a>
                     </div>
@@ -132,7 +132,7 @@
                     <% if (latestNews && latestNews.length) { %>
                         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                             <% latestNews.forEach((item, i) => { %>
-                                <a href="/<%= item.type === 'internship' ? 'internship' : item.type === 'case' ? 'cases' : item.type === 'book' || item.type === 'bareact' ? 'books' : item.type === 'resource' ? 'resource' : 'news' %>.html" class="glass-card p-6 rounded-xl flex flex-col group cursor-pointer reveal <%= i > 0 ? 'delay-' + (i * 100) : '' %> hover:bg-deep-navy/30">
+                                <a href="/<%= item.type === 'internship' ? 'internship' : item.type === 'case' ? 'cases' : item.type === 'book' || item.type === 'bareact' ? 'books' : item.type === 'resource' ? 'resource' : 'news' %>" class="glass-card p-6 rounded-xl flex flex-col group cursor-pointer reveal <%= i > 0 ? 'delay-' + (i * 100) : '' %> hover:bg-deep-navy/30">
                                     <div class="flex items-center justify-between mb-4">
                                         <span class="text-xs font-semibold px-2 py-1 bg-royal-blue/20 text-royal-blue rounded capitalize"><%= item.category || item.type %></span>
                                         <span class="text-xs text-light-gray/60"><%= new Date(item.createdAt).toLocaleDateString() %></span>
@@ -153,7 +153,7 @@
                     <% } %>
 
                     <div class="mt-8 text-center md:hidden reveal">
-                        <a href="/news.html" class="btn-secondary px-6 py-2.5 rounded-lg inline-block w-full">View All Updates</a>
+                        <a href="/news" class="btn-secondary px-6 py-2.5 rounded-lg inline-block w-full">View All Updates</a>
                     </div>
                 </div>
             </section>
