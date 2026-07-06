@@ -29,6 +29,14 @@ const ctaIcon = item.template === 'video' ? 'ph-play' : (item.template === 'pdf'
         <h3 class="font-heading font-bold text-lg text-white-text mb-1 group-hover:text-gold transition-colors line-clamp-2"><%= item.title %></h3>
     <% } %>
 
+     <% if (item.type === 'book') { %>
+        <a href="/book/<%= item._id %>" class="block">
+            <h3 class="font-heading font-bold text-lg text-white-text mb-1 group-hover:text-gold transition-colors line-clamp-2 hover:underline"><%= item.title %></h3>
+        </a>
+    <% } else { %>
+        <h3 class="font-heading font-bold text-lg text-white-text mb-1 group-hover:text-gold transition-colors line-clamp-2"><%= item.title %></h3>
+    <% } %>
+
     <% if (item.subtitle) { %>
         <p class="text-xs text-light-gray/70 mb-3 flex items-center gap-1.5">
             <i class="ph ph-user"></i> <%= item.subtitle %>
