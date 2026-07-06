@@ -8,6 +8,7 @@ router.get('/', content.home);
 router.get('/resource', content.resources);
 router.get('/resource/:semester/:subjectCode/:category', content.resourceDetail);
 router.get('/books', content.books);
+router.get('/book/:id', content.bookDetail);
 router.get('/cases', content.cases);
 router.get('/case/:id', content.caseDetail);
 router.get('/internship', content.internships);
