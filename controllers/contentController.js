@@ -85,6 +85,26 @@ exports.cases = async (req, res) => {
     res.render('cases', { active: 'cases', items });
 };
 
+exports.bookDetail = async (req, res) => {
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+        return res.status(404).render('error', { title: 'Not Found', message: 'That book or Bare Act does not exist.' });
+    }
+
+    const item = await Content.findOne({
+        _id: id,
+        type: { $in: ['book', 'bareact'] },
+        status: 'published',
+    }).lean();
+
+    if (!item) {
+        return res.status(404).render('error', { title: 'Not Found', message: 'That book or Bare Act does not exist or is not published yet.' });
+    }
+
+    res.render('book-detail', { active: 'books', item });
+};
+
 exports.caseDetail = async (req, res) => {
     const { id } = req.params;
 

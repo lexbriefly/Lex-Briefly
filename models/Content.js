@@ -16,8 +16,8 @@ const contentSchema = new mongoose.Schema(
         },
 
         title: { type: String, required: true, trim: true, maxlength: 200 },
-        subtitle: { type: String, trim: true, maxlength: 200 }, // author / court / organisation / source
-        description: { type: String, trim: true, maxlength: 3000 },
+        subtitle: { type: String, trim: true }, // author / court / organisation / source
+        description: { type: String, trim: true },
 
         category: { type: String, trim: true }, // e.g. Semester 3, Constitutional Law, Corporate
         tags: [{ type: String, trim: true }],
