@@ -52,9 +52,9 @@
             </section>
 
             <section id="booksGridContainer" class="py-16 bg-rich-black transition-opacity duration-300">
-                <div class="container mx-auto px-6 md:px-12">
+                <div class="container mx-auto px-9 md:px-20">
                     <% if (books && books.length) { %>
-                        <div id="cardGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                        <div id="cardGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
                             <% books.forEach(item => { %>
                                 <%- include('partials/content-card', { item }) %>
                             <% }) %>
@@ -69,9 +69,9 @@
             </section>
 
             <section id="actsGridContainer" class="py-16 bg-rich-black transition-opacity duration-300 hidden">
-                <div class="container mx-auto px-6 md:px-12">
+                <div class="container mx-auto px-9 md:px-20">
                     <% if (bareActs && bareActs.length) { %>
-                        <div id="actsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                        <div id="actsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
                             <% bareActs.forEach(item => { %>
                                 <%- include('partials/content-card', { item }) %>
                             <% }) %>
